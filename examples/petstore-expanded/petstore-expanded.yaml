@@ -151,10 +151,15 @@ components:
           type: string
           description: Type of the pet
           minLength: 2
-          maxLength: 8
+          maxLength: 32
           pattern: '^[A-Za-z]+'
+        size:
+          type: integer
+          minimum: 0
+          maximum: 20
       required:
         - name
+        - size
     Error:
       required:
         - code

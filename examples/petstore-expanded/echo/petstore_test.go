@@ -63,6 +63,7 @@ func TestPetStore(t *testing.T) {
 	newPet := api.NewPet{
 		Name: "Spot",
 		Tag:  &tag,
+		Size: 20,
 	}
 	result := testutil.NewRequest().Post("/pets").WithJsonBody(newPet).Go(t, e)
 	// We expect 201 code on successful pet insertion
@@ -99,6 +100,7 @@ func TestPetStore(t *testing.T) {
 	newPet = api.NewPet{
 		Name: "Fido",
 		Tag:  &tag,
+		Size: 0,
 	}
 	result = testutil.NewRequest().Post("/pets").WithJsonBody(newPet).Go(t, e)
 	// We expect 201 code on successful pet insertion
