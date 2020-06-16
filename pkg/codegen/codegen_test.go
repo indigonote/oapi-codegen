@@ -7,11 +7,11 @@ import (
 	"net/http"
 	"testing"
 
-	examplePetstoreClient "sios.tech/indigo/oapi-codegen/examples/petstore-expanded"
-	examplePetstore "sios.tech/indigo/oapi-codegen/examples/petstore-expanded/echo/api"
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/golangci/lint-1"
 	"github.com/stretchr/testify/assert"
+	examplePetstoreClient "sios.tech/indigo/oapi-codegen/examples/petstore-expanded"
+	examplePetstore "sios.tech/indigo/oapi-codegen/examples/petstore-expanded/echo/api"
 )
 
 func TestExamplePetStoreCodeGeneration(t *testing.T) {

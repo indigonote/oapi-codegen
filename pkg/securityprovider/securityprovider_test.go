@@ -3,8 +3,8 @@ package securityprovider
 import (
 	"testing"
 
-	"sios.tech/indigo/oapi-codegen/internal/test/client"
 	"github.com/stretchr/testify/assert"
+	"sios.tech/indigo/oapi-codegen/internal/test/client"
 )
 
 var (

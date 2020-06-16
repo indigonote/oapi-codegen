@@ -9,10 +9,10 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
-	"sios.tech/indigo/oapi-codegen/pkg/runtime"
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/go-chi/chi"
 	"net/http"
+	"sios.tech/indigo/oapi-codegen/pkg/runtime"
 	"strings"
 )
 

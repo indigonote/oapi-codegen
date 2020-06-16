@@ -8,11 +8,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"sios.tech/indigo/oapi-codegen/pkg/runtime"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"sios.tech/indigo/oapi-codegen/pkg/runtime"
 	"strings"
 )
 

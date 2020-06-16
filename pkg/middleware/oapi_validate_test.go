@@ -21,13 +21,13 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"sios.tech/indigo/oapi-codegen/pkg/testutil"
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/getkin/kin-openapi/openapi3filter"
 	"github.com/labstack/echo/v4"
 	echomiddleware "github.com/labstack/echo/v4/middleware"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"sios.tech/indigo/oapi-codegen/pkg/testutil"
 )
 
 var testSchema = `openapi: "3.0.0"

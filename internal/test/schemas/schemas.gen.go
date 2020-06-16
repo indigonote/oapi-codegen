@@ -11,7 +11,6 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
-	"sios.tech/indigo/oapi-codegen/pkg/runtime"
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/labstack/echo/v4"
 	"gopkg.in/yaml.v2"
@@ -19,6 +18,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"sios.tech/indigo/oapi-codegen/pkg/runtime"
 	"strings"
 )
 

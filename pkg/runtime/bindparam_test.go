@@ -18,8 +18,8 @@ import (
 	"testing"
 	"time"
 
-	"sios.tech/indigo/oapi-codegen/pkg/types"
 	"github.com/stretchr/testify/assert"
+	"sios.tech/indigo/oapi-codegen/pkg/types"
 )
 
 func TestSplitParameter(t *testing.T) {

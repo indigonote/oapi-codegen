@@ -6,10 +6,10 @@ package server
 import (
 	"context"
 	"fmt"
-	"sios.tech/indigo/oapi-codegen/pkg/runtime"
-	openapi_types "sios.tech/indigo/oapi-codegen/pkg/types"
 	"github.com/go-chi/chi"
 	"net/http"
+	"sios.tech/indigo/oapi-codegen/pkg/runtime"
+	openapi_types "sios.tech/indigo/oapi-codegen/pkg/types"
 	"time"
 )
 

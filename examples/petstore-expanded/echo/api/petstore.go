@@ -20,9 +20,11 @@ package api
 import (
 	"fmt"
 	"net/http"
+	"regexp"
 	"sync"
 
 	"github.com/labstack/echo/v4"
+	"gopkg.in/go-playground/validator.v9"
 )
 
 type PetStore struct {
@@ -87,6 +89,11 @@ func (p *PetStore) AddPet(ctx echo.Context) error {
 	if err != nil {
 		return sendPetstoreError(ctx, http.StatusBadRequest, "Invalid format for NewPet")
 	}
+	validate := validator.New()
+	validate.RegisterValidation("regex", Regexp)
+	errors := validate.Struct(&newPet)
+	fmt.Println(errors)
+
 	// We now have a pet, let's add it to our "database".
 
 	// We're always asynchronous, so lock unsafe operations below
@@ -142,4 +149,9 @@ func (p *PetStore) DeletePet(ctx echo.Context, id int64) error {
 	}
 	delete(p.Pets, id)
 	return ctx.NoContent(http.StatusNoContent)
+}
+
+func Regexp(fl validator.FieldLevel) bool {
+	re := regexp.MustCompile(fl.Param())
+	return re.MatchString(fl.Field().String())
 }

@@ -60,6 +60,7 @@ type Property struct {
 	Schema        Schema
 	Required      bool
 	Nullable      bool
+	Validation    map[string]string
 }
 
 func (p Property) GoFieldName() string {
@@ -189,12 +190,14 @@ func GenerateGoSchema(sref *openapi3.SchemaRef, path []string) (Schema, error) {
 				if p.Value != nil {
 					description = p.Value.Description
 				}
+				v := parseValidateRule(p.Value, required)
 				prop := Property{
 					JsonFieldName: pName,
 					Schema:        pSchema,
 					Required:      required,
 					Description:   description,
 					Nullable:      p.Value.Nullable,
+					Validation:    v,
 				}
 				outSchema.Properties = append(outSchema.Properties, prop)
 			}
@@ -306,10 +309,26 @@ func GenFieldsFromProperties(props []Property) []string {
 			field += fmt.Sprintf("\n%s\n", StringToGoComment(p.Description))
 		}
 		field += fmt.Sprintf("    %s %s", p.GoFieldName(), p.GoTypeDef())
+		validator := ""
+		if len(p.Validation) > 0 {
+			s := []string{}
+			for _, v := range p.Validation {
+				s = append(s, v)
+			}
+			validator = strings.Join(s, ",")
+		}
 		if p.Required || p.Nullable {
-			field += fmt.Sprintf(" `json:\"%s\"`", p.JsonFieldName)
+			if validator != "" {
+				field += fmt.Sprintf(" `json:\"%s\" validate:\"%s\"`", p.JsonFieldName, validator)
+			} else {
+				field += fmt.Sprintf(" `json:\"%s\"`", p.JsonFieldName)
+			}
 		} else {
-			field += fmt.Sprintf(" `json:\"%s,omitempty\"`", p.JsonFieldName)
+			if validator != "" {
+				field += fmt.Sprintf(" `json:\"%s,omitempty\" validate:\"%s\"`", p.JsonFieldName, validator)
+			} else {
+				field += fmt.Sprintf(" `json:\"%s,omitempty\"`", p.JsonFieldName)
+			}
 		}
 		fields = append(fields, field)
 	}
@@ -459,4 +478,51 @@ func paramToGoType(param *openapi3.Parameter, path []string) (Schema, error) {
 
 	// For json, we go through the standard schema mechanism
 	return GenerateGoSchema(mt.Schema, path)
+}
+
+func parseValidateRule(schema *openapi3.Schema, required bool) map[string]string {
+	v := map[string]string{}
+
+	if required {
+		v["required"] = "required"
+	}
+
+	if schema == nil {
+		return v
+	}
+
+	if schema.MinLength > 0 {
+		v["minlength"] = fmt.Sprintf("min=%d", schema.MinLength)
+	}
+
+	if schema.MaxLength != nil {
+		v["maxlength"] = fmt.Sprintf("max=%d", *schema.MaxLength)
+	}
+
+	if schema.Min != nil {
+		if schema.Type == "integer" {
+			v["min"] = fmt.Sprintf("min=%d", int(*schema.Min))
+		} else {
+			v["min"] = fmt.Sprintf("min=%f", *schema.Min)
+		}
+	}
+	if schema.Max != nil {
+		if schema.Type == "integer" {
+			v["max"] = fmt.Sprintf("max=%d", int(*schema.Max))
+		} else {
+			v["max"] = fmt.Sprintf("max=%f", *schema.Max)
+		}
+	}
+
+	if schema.Pattern != "" {
+		// This is deprecated as it may not work properly
+		// https://github.com/go-playground/validator/issues/346
+		v["regex"] = fmt.Sprintf("regex=%s", schema.Pattern)
+	}
+
+	// 	if schema.Format != "" {
+	//		v["format"] = fmt.Sprintf("%s", schema.Format)
+	//	}
+
+	return v
 }

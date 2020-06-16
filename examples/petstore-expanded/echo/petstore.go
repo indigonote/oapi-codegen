@@ -10,10 +10,10 @@ import (
 	"fmt"
 	"os"
 
-	"sios.tech/indigo/oapi-codegen/examples/petstore-expanded/echo/api"
-	"sios.tech/indigo/oapi-codegen/pkg/middleware"
 	"github.com/labstack/echo/v4"
 	echomiddleware "github.com/labstack/echo/v4/middleware"
+	"sios.tech/indigo/oapi-codegen/examples/petstore-expanded/echo/api"
+	"sios.tech/indigo/oapi-codegen/pkg/middleware"
 )
 
 func main() {
