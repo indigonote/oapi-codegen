@@ -256,6 +256,7 @@ func Generate(swagger *openapi3.Swagger, packageName string, opts Options) (stri
 }
 
 func GenerateTypeDefinitions(t *template.Template, swagger *openapi3.Swagger, ops []OperationDefinition) (string, error) {
+
 	schemaTypes, err := GenerateTypesForSchemas(t, swagger.Components.Schemas)
 	if err != nil {
 		return "", errors.Wrap(err, "error generating Go types for component schemas")
@@ -278,7 +279,31 @@ func GenerateTypeDefinitions(t *template.Template, swagger *openapi3.Swagger, op
 		return "", errors.Wrap(err, "error generating Go types for component request bodies")
 	}
 	allTypes = append(allTypes, bodyTypes...)
+	if len(allTypes) == 0 {
+		b, err := swagger.MarshalJSON()
+		if err != nil {
+			return "", errors.Wrap(err, "error generating Go types for component schemas")
+		}
+		schema := openapi3.NewSchema()
+		if err := schema.UnmarshalJSON(b); err != nil {
+			return "", errors.Wrap(err, "error generating Go types for component schemas")
+		}
+		schemaRef := openapi3.NewSchemaRef("", schema)
+		schemaName := schema.Title
+		goSchema, err := GenerateGoSchema(schemaRef, []string{schemaName})
+		if err != nil {
+			return "", errors.Wrap(err, fmt.Sprintf("error converting Schema %s to Go type", schemaName))
+		}
 
+		td := TypeDefinition{
+			JsonName: schemaName,
+			TypeName: SchemaNameToTypeName(schemaName),
+			Schema:   goSchema,
+		}
+
+		allTypes = append(allTypes, td)
+		allTypes = append(allTypes, td.Schema.GetAdditionalTypeDefs()...)
+	}
 	paramTypesOut, err := GenerateTypesForOperations(t, ops)
 	if err != nil {
 		return "", errors.Wrap(err, "error generating Go types for operation parameters")

@@ -1,0 +1,14 @@
+title: User
+type: object
+description: ''
+x-examples: {}
+properties:
+  id:
+    type: string
+  name:
+    type: string
+    minLength: 1
+    maxLength: 13
+required:
+  - id
+  - name

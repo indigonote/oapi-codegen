@@ -1,0 +1,29 @@
+title: MedicalPoint
+type: object
+properties:
+  id:
+    type: string
+  segment:
+    type: string
+  category:
+    type: string
+  practiceCode:
+    type: string
+  announcementDate:
+    type: string
+    format: date
+  effectiveDate:
+    type: string
+    format: date
+  point:
+    type: integer
+    minimum: 1
+    maximum: 10
+  name:
+    type: string
+required:
+  - id
+  - segment
+  - announcementDate
+  - effectiveDate
+  - point

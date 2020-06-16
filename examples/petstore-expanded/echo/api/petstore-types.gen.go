@@ -18,7 +18,7 @@ type NewPet struct {
 
 	// Name of the pet
 	Name string `json:"name" validate:"required"`
-	Size int    `json:"size" validate:"required,min=0,max=20"`
+	Size int    `json:"size" validate:"min=0,max=20,required"`
 
 	// Type of the pet
 	Tag *string `json:"tag,omitempty" validate:"min=2,max=32,regex=^[A-Za-z]+"`
@@ -31,7 +31,7 @@ type Pet struct {
 	// Embedded fields due to inline allOf schema
 
 	// Unique id of the pet
-	Id int64 `json:"id" validate:"max=100,required,min=1"`
+	Id int64 `json:"id" validate:"required,min=1,max=100"`
 }
 
 // FindPetsParams defines parameters for FindPets.
@@ -49,4 +49,3 @@ type AddPetJSONBody NewPet
 
 // AddPetRequestBody defines body for AddPet for application/json ContentType.
 type AddPetJSONRequestBody AddPetJSONBody
-

@@ -41,8 +41,8 @@ type GenericObject map[string]interface{}
 type NullableProperties struct {
 	Optional            *string `json:"optional,omitempty"`
 	OptionalAndNullable *string `json:"optionalAndNullable"`
-	Required            string  `json:"required"`
-	RequiredAndNullable *string `json:"requiredAndNullable"`
+	Required            string  `json:"required" validate:"required"`
+	RequiredAndNullable *string `json:"requiredAndNullable" validate:"required"`
 }
 
 // Issue185JSONBody defines parameters for Issue185.
