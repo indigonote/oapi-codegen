@@ -1,0 +1,200 @@
+openapi: "3.0.1"
+info:
+  version: 1.0.0
+  title: Test Server
+  license:
+    name: MIT
+paths:
+  /ensure-everything-is-referenced:
+    get:
+      operationId: ensureEverythingIsReferenced
+      description: |
+        This endpoint exists so that components can be created in this
+        spec and not be pruned
+    # TODO: figure out why uncommenting this causes failures
+    #   parameters:
+    #     - $ref: "#/components/parameters/ParameterObject"
+      requestBody:
+        $ref: "#/components/requestBodies/RequestBody"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  one:
+                    $ref: "#/components/schemas/AdditionalPropertiesObject1"
+                  two:
+                    $ref: "#/components/schemas/AdditionalPropertiesObject2"
+                  three:
+                    $ref: "#/components/schemas/AdditionalPropertiesObject3"
+                  four:
+                    $ref: "#/components/schemas/AdditionalPropertiesObject4"
+                  five:
+                    $ref: "#/components/schemas/AdditionalPropertiesObject5"
+                  jsonField:
+                    $ref: "#/components/schemas/ObjectWithJsonField"
+        default:
+          $ref: "#/components/responses/ResponseObject"
+  /params_with_add_props:
+    get:
+      operationId: ParamsWithAddProps
+      description: |
+        A path with parameters and a body which require additional properties
+      parameters:
+        - name: p1
+          description: |
+            This parameter has additional properties
+          in: query
+          required: true
+          style: simple
+          schema:
+            type: object
+            additionalProperties: true
+        - name: p2
+          description: |
+            This parameter has an anonymous inner property which needs to be
+            turned into a proper type for additionalProperties to work
+          in: query
+          required: true
+          schema:
+            properties:
+              inner:
+                type: object
+                additionalProperties:
+                  type: string
+            required: [inner]
+    post:
+      operationId: BodyWithAddProps
+      description: |
+        Has a request body which contains a direct additionalProperties, and
+        an anonymous inner property with additionalProperties
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                name:
+                  type: string
+                inner:
+                  type: object
+                  additionalProperties:
+                    type: integer
+              required: [name, inner]
+              additionalProperties: true
+components:
+  schemas:
+    SchemaObject:
+      properties:
+        role:
+          type: string
+        firstName:
+          type: string
+      required:
+        - role
+        - firstName
+    AdditionalPropertiesObject1:
+      description: Has additional properties of type int
+      type: object
+      properties:
+        name:
+          type: string
+        id:
+          type: integer
+        optional:
+          type: string
+      required: [name, id]
+      additionalProperties:
+        type: integer
+    AdditionalPropertiesObject2:
+      description: Does not allow additional properties
+      type: object
+      properties:
+        name:
+          type: string
+        id:
+          type: integer
+      required: [name, id]
+      additionalProperties: false
+    AdditionalPropertiesObject3:
+      description: Allows any additional property
+      type: object
+      properties:
+        name:
+          type: string
+      required: [name]
+      additionalProperties: true
+    AdditionalPropertiesObject4:
+      description: Has anonymous field which has additional properties
+      type: object
+      properties:
+        name:
+          type: string
+        inner:
+          type: object
+          properties:
+            name:
+              type: string
+          required: [name]
+          additionalProperties: true
+      required: [inner, name]
+      additionalProperties: true
+    AdditionalPropertiesObject5:
+      description: Has additional properties with schema for dictionaries
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/SchemaObject'
+    ObjectWithJsonField:
+      type: object
+      properties:
+        name:
+          type: string
+        value1:
+          type: string
+          format: json
+        value2:
+          type: string
+          format: json
+      required: [name, value1]
+  responses:
+    ResponseObject:
+      description: A simple response object
+      content:
+        application/json:
+          schema:
+            properties:
+              Field:
+                $ref: "#/components/schemas/SchemaObject"
+            required: [ Field ]
+        text/plain:
+          schema:
+            type: string
+  parameters:
+    ParameterObject:
+      name: ParameterObject
+      description: a parameter
+      in: query
+      content:
+        application/json:
+          schema:
+            properties:
+              Field:
+                $ref: "#/components/schemas/SchemaObject"
+            required: [ Field ]
+        text/plain:
+          schema:
+            type: string
+  requestBodies:
+    RequestBody:
+      content:
+        application/json:
+          schema:
+            properties:
+              Field:
+                $ref: "#/components/schemas/SchemaObject"
+            required: [ Field ]
+        text/plain:
+          schema:
+            type: string
