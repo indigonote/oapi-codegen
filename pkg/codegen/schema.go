@@ -524,5 +524,14 @@ func parseValidateRule(schema *openapi3.Schema, required bool) map[string]string
 	//		v["format"] = fmt.Sprintf("%s", schema.Format)
 	//	}
 
+	if len(schema.Enum) > 0 {
+		if schema.Type != "array" {
+			e := "oneof="
+			for _, enum := range schema.Enum {
+				e += fmt.Sprint(enum) + " "
+			}
+			v["oneof"] = e
+		}
+	}
 	return v
 }
