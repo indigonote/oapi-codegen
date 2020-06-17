@@ -524,6 +524,17 @@ func parseValidateRule(schema *openapi3.Schema, required bool) map[string]string
 	//		v["format"] = fmt.Sprintf("%s", schema.Format)
 	//	}
 
+	if schema.Type == "array" {
+		// skip
+		if schema.MinItems > 0 {
+			v["minitems"] = fmt.Sprintf("min=%d", schema.MinItems)
+		}
+
+		if schema.MaxItems != nil {
+			v["maxitems"] = fmt.Sprintf("max=%d", *schema.MaxItems)
+		}
+	}
+
 	if len(schema.Enum) > 0 {
 		if schema.Type != "array" {
 			e := "oneof="
