@@ -10,12 +10,12 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/deepmap/oapi-codegen/pkg/runtime"
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/labstack/echo/v4"
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"sios.tech/indigo/oapi-codegen/pkg/runtime"
 	"strings"
 )
 

@@ -8,11 +8,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/deepmap/oapi-codegen/pkg/runtime"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"sios.tech/indigo/oapi-codegen/pkg/runtime"
 	"strings"
 )
 
@@ -31,10 +31,10 @@ type NewPet struct {
 
 	// Name of the pet
 	Name string `json:"name" validate:"required"`
-	Size int    `json:"size" validate:"min=0,max=20,required"`
+	Size int    `json:"size" validate:"required,min=0,max=20"`
 
 	// Type of the pet
-	Tag *string `json:"tag,omitempty" validate:"regex=^[A-Za-z]+,min=2,max=32"`
+	Tag *string `json:"tag,omitempty" validate:"min=2,max=32,regex=^[A-Za-z]+"`
 }
 
 // Pet defines model for Pet.

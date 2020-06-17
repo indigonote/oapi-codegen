@@ -3,6 +3,7 @@ module sios.tech/indigo/oapi-codegen
 require (
 	github.com/cyberdelia/templates v0.0.0-20141128023046-ca7fffd4298c
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/deepmap/oapi-codegen v1.3.8
 	github.com/getkin/kin-openapi v0.13.0
 	github.com/go-chi/chi v4.0.2+incompatible
 	github.com/go-playground/universal-translator v0.17.0 // indirect
