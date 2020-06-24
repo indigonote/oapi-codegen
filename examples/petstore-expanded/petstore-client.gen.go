@@ -30,7 +30,7 @@ type Error struct {
 type NewPet struct {
 
 	// Name of the pet
-	Name string `json:"name" validate:"required"`
+	Name string `json:"name" validate:"required,fhirString,max=1048576"`
 	Size int    `json:"size" validate:"required,min=0,max=20"`
 
 	// Type of the pet
