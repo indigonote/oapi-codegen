@@ -41,6 +41,7 @@ func (s *Schema) MergeProperty(p Property) error {
 		if e.JsonFieldName == p.JsonFieldName && !PropertiesEqual(e, p) {
 			return errors.New(fmt.Sprintf("property '%s' already exists with a different type", e.JsonFieldName))
 		}
+	}
 	s.Properties = append(s.Properties, p)
 	return nil
 }
