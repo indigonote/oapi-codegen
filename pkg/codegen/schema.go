@@ -1,6 +1,7 @@
 package codegen
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -40,7 +41,6 @@ func (s *Schema) MergeProperty(p Property) error {
 		if e.JsonFieldName == p.JsonFieldName && !PropertiesEqual(e, p) {
 			return errors.New(fmt.Sprintf("property '%s' already exists with a different type", e.JsonFieldName))
 		}
-	}
 	s.Properties = append(s.Properties, p)
 	return nil
 }
@@ -542,6 +542,24 @@ func parseValidateRule(schema *openapi3.Schema, required bool) map[string]string
 				e += fmt.Sprint(enum) + " "
 			}
 			v["oneof"] = e
+		}
+	}
+
+	if len(schema.Extensions) > 0 {
+		for key, ext := range schema.Extensions {
+			if key == "x-go-custom-tag" {
+				var s string
+				var e []string
+				err := json.Unmarshal(ext.(json.RawMessage), &s)
+				if err != nil {
+					if err := json.Unmarshal(ext.(json.RawMessage), &e); err != nil {
+						panic(err)
+					}
+				} else {
+					e = append(e, s)
+				}
+				v["custom-tag"] = strings.Join(e[:], ",")
+			}
 		}
 	}
 	return v

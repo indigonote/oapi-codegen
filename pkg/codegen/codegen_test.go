@@ -293,6 +293,7 @@ components:
       properties:
         name:
           type: string
+          x-go-custom-tag: fhirString
         alive_since:
           type: string
           format: date-time
@@ -301,6 +302,9 @@ components:
       properties:
         name:
           type: string
+          x-go-custom-tag:
+            - fhirString
+            - max=1048576
         dead_since:
           type: string
           format: date-time
