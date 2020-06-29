@@ -147,8 +147,9 @@ components:
         name:
           type: string
           description: Name of the pet
+          nullable: true
           x-go-custom-tag:
-            - fhirString
+            - alphanum
             - max=1048576
         tag:
           type: string
@@ -161,7 +162,6 @@ components:
           minimum: 0
           maximum: 20
       required:
-        - name
         - size
     Error:
       required:

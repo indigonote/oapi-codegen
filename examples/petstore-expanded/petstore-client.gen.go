@@ -30,11 +30,11 @@ type Error struct {
 type NewPet struct {
 
 	// Name of the pet
-	Name string `json:"name" validate:"required,fhirString,max=1048576"`
-	Size int    `json:"size" validate:"required,min=0,max=20"`
+	Name *string `json:"name" validate:"omitempty,alphanum,max=1048576"`
+	Size int     `json:"size" validate:"required,min=0,max=20"`
 
 	// Type of the pet
-	Tag *string `json:"tag,omitempty" validate:"min=2,max=32,regex=^[A-Za-z]+"`
+	Tag *string `json:"tag,omitempty" validate:"omitempty,min=2,max=32,regex=^[A-Za-z]+"`
 }
 
 // Pet defines model for Pet.
@@ -44,7 +44,7 @@ type Pet struct {
 	// Embedded fields due to inline allOf schema
 
 	// Unique id of the pet
-	Id int64 `json:"id" validate:"required,min=1,max=100"`
+	Id int64 `json:"id" validate:"max=100,required,min=1"`
 }
 
 // FindPetsParams defines parameters for FindPets.

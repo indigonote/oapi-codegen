@@ -19,6 +19,7 @@ package api
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"regexp"
 	"sync"
@@ -91,9 +92,11 @@ func (p *PetStore) AddPet(ctx echo.Context) error {
 	}
 	validate := validator.New()
 	validate.RegisterValidation("regex", Regexp)
-	errors := validate.Struct(&newPet)
-	fmt.Println(errors)
-
+	err = validate.Struct(&newPet)
+	if err != nil {
+		log.Println(err)
+		return sendPetstoreError(ctx, http.StatusBadRequest, err.Error())
+	}
 	// We now have a pet, let's add it to our "database".
 
 	// We're always asynchronous, so lock unsafe operations below
