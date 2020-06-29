@@ -60,8 +60,9 @@ func TestPetStore(t *testing.T) {
 	// the stack except the well-tested HTTP system in Go, which there is no
 	// point for us to test.
 	tag := "TagOfSpot"
+	name := "Spot"
 	newPet := api.NewPet{
-		Name: "Spot",
+		Name: nil,
 		Tag:  &tag,
 		Size: 20,
 	}
@@ -97,10 +98,11 @@ func TestPetStore(t *testing.T) {
 
 	// Let's insert another pet for subsequent tests.
 	tag = "TagOfFido"
+	name = "Fido"
 	newPet = api.NewPet{
-		Name: "Fido",
+		Name: &name,
 		Tag:  &tag,
-		Size: 0,
+		Size: 10,
 	}
 	result = testutil.NewRequest().Post("/pets").WithJsonBody(newPet).Go(t, e)
 	// We expect 201 code on successful pet insertion

@@ -313,6 +313,9 @@ func GenFieldsFromProperties(props []Property) []string {
 		validator := ""
 		if len(p.Validation) > 0 {
 			s := []string{}
+			if !p.Required || p.Nullable {
+				s = append(s, "omitempty")
+			}
 			for _, v := range p.Validation {
 				s = append(s, v)
 			}

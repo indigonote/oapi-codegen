@@ -30,8 +30,9 @@ func TestPetStore(t *testing.T) {
 
 	t.Run("Add pet", func(t *testing.T) {
 		tag := "TagOfSpot"
+		name := "Spot"
 		newPet := api.NewPet{
-			Name: "Spot",
+			Name: &name,
 			Tag:  &tag,
 		}
 
