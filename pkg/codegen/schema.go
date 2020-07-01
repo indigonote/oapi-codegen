@@ -487,10 +487,6 @@ func paramToGoType(param *openapi3.Parameter, path []string) (Schema, error) {
 func parseValidateRule(schema *openapi3.Schema, required bool) map[string]string {
 	v := map[string]string{}
 
-	if required {
-		v["required"] = "required"
-	}
-
 	if schema == nil {
 		return v
 	}

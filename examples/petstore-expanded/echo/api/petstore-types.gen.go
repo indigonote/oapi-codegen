@@ -7,10 +7,10 @@ package api
 type Error struct {
 
 	// Error code
-	Code int32 `json:"code" validate:"required"`
+	Code int32 `json:"code"`
 
 	// Error message
-	Message string `json:"message" validate:"required"`
+	Message string `json:"message"`
 }
 
 // NewPet defines model for NewPet.
@@ -18,7 +18,7 @@ type NewPet struct {
 
 	// Name of the pet
 	Name *string `json:"name" validate:"omitempty,alphanum,max=1048576"`
-	Size int     `json:"size" validate:"min=0,max=20,required"`
+	Size int     `json:"size" validate:"min=0,max=20"`
 
 	// Type of the pet
 	Tag *string `json:"tag,omitempty" validate:"omitempty,min=2,max=32,regex=^[A-Za-z]+"`
@@ -31,7 +31,7 @@ type Pet struct {
 	// Embedded fields due to inline allOf schema
 
 	// Unique id of the pet
-	Id int64 `json:"id" validate:"required,min=1,max=100"`
+	Id int64 `json:"id" validate:"min=1,max=100"`
 }
 
 // FindPetsParams defines parameters for FindPets.

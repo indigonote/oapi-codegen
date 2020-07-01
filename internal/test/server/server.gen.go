@@ -24,8 +24,8 @@ type EveryTypeOptional struct {
 	DoubleField          *float64            `json:"double_field,omitempty"`
 	FloatField           *float32            `json:"float_field,omitempty"`
 	InlineObjectField    *struct {
-		Name   string `json:"name" validate:"required"`
-		Number int    `json:"number" validate:"required"`
+		Name   string `json:"name"`
+		Number int    `json:"number"`
 	} `json:"inline_object_field,omitempty"`
 	Int32Field      *int32      `json:"int32_field,omitempty"`
 	Int64Field      *int64      `json:"int64_field,omitempty"`
@@ -37,24 +37,24 @@ type EveryTypeOptional struct {
 
 // EveryTypeRequired defines model for EveryTypeRequired.
 type EveryTypeRequired struct {
-	ArrayInlineField     []int              `json:"array_inline_field" validate:"required"`
-	ArrayReferencedField []SomeObject       `json:"array_referenced_field" validate:"required"`
-	BoolField            bool               `json:"bool_field" validate:"required"`
-	ByteField            []byte             `json:"byte_field" validate:"required"`
-	DateField            openapi_types.Date `json:"date_field" validate:"required"`
-	DateTimeField        time.Time          `json:"date_time_field" validate:"required"`
-	DoubleField          float64            `json:"double_field" validate:"required"`
-	FloatField           float32            `json:"float_field" validate:"required"`
+	ArrayInlineField     []int              `json:"array_inline_field"`
+	ArrayReferencedField []SomeObject       `json:"array_referenced_field"`
+	BoolField            bool               `json:"bool_field"`
+	ByteField            []byte             `json:"byte_field"`
+	DateField            openapi_types.Date `json:"date_field"`
+	DateTimeField        time.Time          `json:"date_time_field"`
+	DoubleField          float64            `json:"double_field"`
+	FloatField           float32            `json:"float_field"`
 	InlineObjectField    struct {
-		Name   string `json:"name" validate:"required"`
-		Number int    `json:"number" validate:"required"`
-	} `json:"inline_object_field" validate:"required"`
-	Int32Field      int32      `json:"int32_field" validate:"required"`
-	Int64Field      int64      `json:"int64_field" validate:"required"`
-	IntField        int        `json:"int_field" validate:"required"`
-	NumberField     float32    `json:"number_field" validate:"required"`
-	ReferencedField SomeObject `json:"referenced_field" validate:"required"`
-	StringField     string     `json:"string_field" validate:"required"`
+		Name   string `json:"name"`
+		Number int    `json:"number"`
+	} `json:"inline_object_field"`
+	Int32Field      int32      `json:"int32_field"`
+	Int64Field      int64      `json:"int64_field"`
+	IntField        int        `json:"int_field"`
+	NumberField     float32    `json:"number_field"`
+	ReferencedField SomeObject `json:"referenced_field"`
+	StringField     string     `json:"string_field"`
 }
 
 // ReservedKeyword defines model for ReservedKeyword.
@@ -64,13 +64,13 @@ type ReservedKeyword struct {
 
 // Resource defines model for Resource.
 type Resource struct {
-	Name  string  `json:"name" validate:"required"`
-	Value float32 `json:"value" validate:"required"`
+	Name  string  `json:"name"`
+	Value float32 `json:"value"`
 }
 
 // SomeObject defines model for some_object.
 type SomeObject struct {
-	Name string `json:"name" validate:"required"`
+	Name string `json:"name"`
 }
 
 // Argument defines model for argument.
@@ -81,7 +81,7 @@ type ResponseWithReference SomeObject
 
 // SimpleResponse defines model for SimpleResponse.
 type SimpleResponse struct {
-	Name string `json:"name" validate:"required"`
+	Name string `json:"name"`
 }
 
 // GetWithArgsParams defines parameters for GetWithArgs.
