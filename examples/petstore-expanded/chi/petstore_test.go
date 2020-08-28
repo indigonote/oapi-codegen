@@ -10,7 +10,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"sios.tech/indigo/oapi-codegen/examples/petstore-expanded/chi/api"
+	"github.com/indigonote/oapi-codegen/examples/petstore-expanded/chi/api"
 )
 
 func DoJson(handler http.Handler, method string, url string, body interface{}) *httptest.ResponseRecorder {

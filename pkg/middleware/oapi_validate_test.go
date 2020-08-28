@@ -27,7 +27,7 @@ import (
 	echomiddleware "github.com/labstack/echo/v4/middleware"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"sios.tech/indigo/oapi-codegen/pkg/testutil"
+	"github.com/indigonote/oapi-codegen/pkg/testutil"
 )
 
 var testSchema = `openapi: "3.0.0"

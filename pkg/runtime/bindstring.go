@@ -20,7 +20,7 @@ import (
 	"strconv"
 	"time"
 
-	"sios.tech/indigo/oapi-codegen/pkg/types"
+	"github.com/indigonote/oapi-codegen/pkg/types"
 )
 
 // This function takes a string, and attempts to assign it to the destination

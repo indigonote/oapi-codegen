@@ -23,7 +23,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"sios.tech/indigo/oapi-codegen/pkg/types"
+	"github.com/indigonote/oapi-codegen/pkg/types"
 )
 
 // This function binds a parameter as described in the Path Parameters

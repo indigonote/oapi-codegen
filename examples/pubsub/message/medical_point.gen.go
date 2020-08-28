@@ -4,17 +4,18 @@
 package message
 
 import (
-	openapi_types "sios.tech/indigo/oapi-codegen/pkg/types"
+	openapi_types "github.com/deepmap/oapi-codegen/pkg/types"
 )
 
 // MedicalPoint defines model for MedicalPoint.
 type MedicalPoint struct {
-	AnnouncementDate openapi_types.Date `json:"announcementDate" validate:"required"`
+	AnnouncementDate openapi_types.Date `json:"announcementDate"`
 	Category         *string            `json:"category,omitempty"`
-	EffectiveDate    openapi_types.Date `json:"effectiveDate" validate:"required"`
-	Id               string             `json:"id" validate:"required"`
+	EffectiveDate    openapi_types.Date `json:"effectiveDate"`
+	Id               string             `json:"id"`
 	Name             *string            `json:"name,omitempty"`
-	Point            int                `json:"point" validate:"required,min=1,max=10"`
+	Point            int                `json:"point" validate:"min=1,max=10"`
 	PracticeCode     *string            `json:"practiceCode,omitempty"`
-	Segment          string             `json:"segment" validate:"required"`
+	Segment          string             `json:"segment"`
 }
+

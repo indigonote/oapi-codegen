@@ -12,8 +12,8 @@ import (
 
 	"github.com/labstack/echo/v4"
 	echomiddleware "github.com/labstack/echo/v4/middleware"
-	"sios.tech/indigo/oapi-codegen/examples/petstore-expanded/echo/api"
-	"sios.tech/indigo/oapi-codegen/pkg/middleware"
+	"github.com/indigonote/oapi-codegen/examples/petstore-expanded/echo/api"
+	"github.com/indigonote/oapi-codegen/pkg/middleware"
 )
 
 func main() {
