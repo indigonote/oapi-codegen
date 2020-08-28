@@ -151,6 +151,8 @@ components:
           x-go-custom-tag:
             - alphanum
             - max=1048576
+          x-es-tag:
+            - text
         tag:
           type: string
           description: Type of the pet
@@ -163,6 +165,8 @@ components:
           maximum: 20
       required:
         - size
+      x-tags:
+        - elastic
     Error:
       required:
         - code

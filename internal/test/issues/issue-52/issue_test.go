@@ -60,6 +60,6 @@ func TestIssue(t *testing.T) {
 		EmbedSpec:          true,
 	}
 
-	_, err = codegen.Generate(swagger, "issue_52", opts)
+	_, _, err = codegen.Generate(swagger, "issue_52", opts)
 	require.NoError(t, err)
 }

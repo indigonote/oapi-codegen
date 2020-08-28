@@ -121,7 +121,7 @@ func main() {
 	} else {
 		fmt.Println(code)
 	}
-	if esCode != "" {
+	if esCode != "" && esCode != "{}" {
 		err = ioutil.WriteFile("es-index-template.json", []byte(esCode), 0644)
 		if err != nil {
 			errExit("error writing generated code to file: %s", err)

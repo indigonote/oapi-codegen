@@ -23,7 +23,7 @@ func TestFilterOperationsByTag(t *testing.T) {
 		assert.NoError(t, err)
 
 		// Run our code generation:
-		code, err := Generate(swagger, packageName, opts)
+		code, _, err := Generate(swagger, packageName, opts)
 		assert.NoError(t, err)
 		assert.NotEmpty(t, code)
 		assert.NotContains(t, code, `"/test/:name"`)
@@ -44,7 +44,7 @@ func TestFilterOperationsByTag(t *testing.T) {
 		assert.NoError(t, err)
 
 		// Run our code generation:
-		code, err := Generate(swagger, packageName, opts)
+		code, _, err := Generate(swagger, packageName, opts)
 		assert.NoError(t, err)
 		assert.NotEmpty(t, code)
 		assert.Contains(t, code, `"/test/:name"`)

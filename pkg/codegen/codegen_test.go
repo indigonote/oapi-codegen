@@ -23,6 +23,7 @@ func TestExamplePetStoreCodeGeneration(t *testing.T) {
 		GenerateEchoServer: true,
 		GenerateTypes:      true,
 		EmbedSpec:          true,
+		GenerateEsTemplate: true,
 	}
 
 	// Get a spec from the example PetStore definition:
@@ -30,9 +31,10 @@ func TestExamplePetStoreCodeGeneration(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Run our code generation:
-	code, err := Generate(swagger, packageName, opts)
+	code, esCode, err := Generate(swagger, packageName, opts)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, code)
+	assert.NotEmpty(t, esCode)
 
 	// Check that we have valid (formattable) code:
 	_, err = format.Source([]byte(code))
@@ -75,7 +77,7 @@ func TestExamplePetStoreCodeGenerationWithUserTemplates(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Run our code generation:
-	code, err := Generate(swagger, packageName, opts)
+	code, _, err := Generate(swagger, packageName, opts)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, code)
 
@@ -126,7 +128,7 @@ func TestExampleOpenAPICodeGeneration(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Run our code generation:
-	code, err := Generate(swagger, packageName, opts)
+	code, _, err := Generate(swagger, packageName, opts)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, code)
 
