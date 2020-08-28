@@ -10,7 +10,7 @@ import (
 	"log"
 	"net/http"
 
-	api "sios.tech/indigo/oapi-codegen/examples/petstore-expanded/chi/api"
+	api "github.com/indigonote/oapi-codegen/examples/petstore-expanded/chi/api"
 )
 
 func main() {

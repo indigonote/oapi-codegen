@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"gopkg.in/go-playground/validator.v9"
-	"sios.tech/indigo/oapi-codegen/examples/pubsub/message"
-	openapi_types "sios.tech/indigo/oapi-codegen/pkg/types"
+	"github.com/indigonote/oapi-codegen/examples/pubsub/message"
+	openapi_types "github.com/indigonote/oapi-codegen/pkg/types"
 )
 
 func main() {

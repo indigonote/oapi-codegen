@@ -1,4 +1,4 @@
-//go:generate go run sios.tech/indigo/oapi-codegen/cmd/oapi-codegen --package=api --generate types,chi-server,spec -o petstore.gen.go ../../petstore-expanded.yaml
+//go:generate go run github.com/indigonote/oapi-codegen/cmd/oapi-codegen --package=api --generate types,chi-server,spec -o petstore.gen.go ../../petstore-expanded.yaml
 
 package api
 

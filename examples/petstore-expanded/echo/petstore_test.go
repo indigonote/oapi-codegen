@@ -24,9 +24,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"sios.tech/indigo/oapi-codegen/examples/petstore-expanded/echo/api"
-	"sios.tech/indigo/oapi-codegen/pkg/middleware"
-	"sios.tech/indigo/oapi-codegen/pkg/testutil"
+	"github.com/indigonote/oapi-codegen/examples/petstore-expanded/echo/api"
+	"github.com/indigonote/oapi-codegen/pkg/middleware"
+	"github.com/indigonote/oapi-codegen/pkg/testutil"
 )
 
 func TestPetStore(t *testing.T) {
