@@ -17,6 +17,7 @@ package codegen
 import (
 	"bufio"
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"go/format"
 	"regexp"
@@ -36,6 +37,7 @@ type Options struct {
 	GenerateEchoServer bool              // GenerateEchoServer specifies whether to generate echo server boilerplate
 	GenerateClient     bool              // GenerateClient specifies whether to generate client boilerplate
 	GenerateTypes      bool              // GenerateTypes specifies whether to generate type definitions
+	GenerateEsTemplate bool              // GenerateEsTemplate specifies whether to generate elastic search index template
 	EmbedSpec          bool              // Whether to embed the swagger spec in the generated code
 	SkipFmt            bool              // Whether to skip go fmt on the generated code
 	SkipPrune          bool              // Whether to skip pruning unused components on the generated code
@@ -323,6 +325,93 @@ func GenerateTypeDefinitions(t *template.Template, swagger *openapi3.Swagger, op
 	return typeDefinitions, nil
 }
 
+// GenerateEs do generate Estemplate
+func GenerateEs(swagger *openapi3.Swagger, packageName string, opts Options) (string, error) {
+	filterOperationsByTag(swagger, opts)
+	if !opts.SkipPrune {
+		pruneUnusedComponents(swagger)
+	}
+
+	// This creates the golang templates text package
+	t := template.New("oapi-codegen").Funcs(TemplateFunctions)
+	// This parses all of our own template files into the template object
+	// above
+	t, err := templates.Parse(t)
+	if err != nil {
+		return "", errors.Wrap(err, "error parsing oapi-codegen templates")
+	}
+
+	// Override built-in templates with user-provided versions
+	for _, tpl := range t.Templates() {
+		if _, ok := opts.UserTemplates[tpl.Name()]; ok {
+			utpl := t.New(tpl.Name())
+			if _, err := utpl.Parse(opts.UserTemplates[tpl.Name()]); err != nil {
+				return "", errors.Wrapf(err, "error parsing user-provided template %q", tpl.Name())
+			}
+		}
+	}
+
+	ops, err := OperationDefinitions(swagger)
+	if err != nil {
+		return "", errors.Wrap(err, "error creating operation definitions")
+	}
+
+	var indicesDefitions string
+	if opts.GenerateTypes {
+		indicesDefitions, err = GenerateEsTemplateDefinitions(t, swagger, ops)
+		if err != nil {
+			return "", errors.Wrap(err, "error generating type definitions")
+		}
+	}
+
+	var es bytes.Buffer
+	i := bufio.NewWriter(&es)
+
+	_, err = i.WriteString(indicesDefitions)
+	if err != nil {
+		return "", errors.Wrap(err, "error writing imports")
+	}
+
+	err = i.Flush()
+	if err != nil {
+		return "", errors.Wrap(err, "error flushing output buffer")
+	}
+
+	esCode := SanitizeCode(es.String())
+	// format json file
+	// Some trick in here
+	// if we have data like "a": {"type": "nested", "type": "text"}
+	// this is incorrect format data. json.Unmarshal will do parse data to "a": {"type": "text"}
+	if esCode != "" {
+		var temp interface{}
+		if err = json.Unmarshal([]byte(esCode), &temp); err != nil {
+			fmt.Println(esCode)
+			return "", errors.Wrap(err, "error encoding Es template")
+		}
+		outEs, err := json.MarshalIndent(temp, "", "    ")
+		if err != nil {
+			fmt.Println(temp)
+			return "", errors.Wrap(err, "error formatting Es template")
+		}
+		esCode = string(outEs)
+	}
+	return esCode, nil
+}
+
+// GenerateEsTemplateDefinitions do generate definition for es template
+func GenerateEsTemplateDefinitions(t *template.Template, swagger *openapi3.Swagger, ops []OperationDefinition) (string, error) {
+	// get all esType of component which has name start with `fhir-`
+	esTemplate, err := GenerateEsTemplateForSchemas(t, swagger.Components.Schemas)
+	if err != nil {
+		return "", errors.Wrap(err, "error generating ES index template for component schemas")
+	}
+	esTemplateOut, err := GenerateEsTemplate(t, esTemplate)
+	if err != nil {
+		return "", errors.Wrap(err, "error generating code for type definitions")
+	}
+	return esTemplateOut, nil
+}
+
 // Generates type definitions for any custom types defined in the
 // components/schemas section of the Swagger spec.
 func GenerateTypesForSchemas(t *template.Template, schemas map[string]*openapi3.SchemaRef) ([]TypeDefinition, error) {
@@ -345,6 +434,66 @@ func GenerateTypesForSchemas(t *template.Template, schemas map[string]*openapi3.
 		types = append(types, goSchema.GetAdditionalTypeDefs()...)
 	}
 	return types, nil
+}
+
+// Generates type definitions for any custom types defined in the
+// components/schemas section of the Swagger spec.
+func GenerateEsTemplateForSchemas(t *template.Template, schemas map[string]*openapi3.SchemaRef) ([]TypeDefinition, error) {
+	types := make([]TypeDefinition, 0)
+	// We're going to define Go types for every object under components/schemas
+	for _, schemaName := range SortedSchemaKeys(schemas) {
+		schemaRef := schemas[schemaName]
+		if !isExistEsTag(schemaRef) {
+			continue
+		}
+		goSchema, err := GenerateEsSchema(schemaRef, []string{schemaName})
+		if err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("error converting Schema %s to Go type", schemaName))
+		}
+
+		types = append(types, TypeDefinition{
+			JsonName: schemaName,
+			TypeName: SchemaNameToTypeName(schemaName),
+			Schema:   goSchema,
+		})
+
+		types = append(types, goSchema.GetAdditionalTypeDefs()...)
+	}
+	return types, nil
+}
+
+func isExistEsTag(sref *openapi3.SchemaRef) bool {
+	schema := sref.Value
+	tags := getXTags(schema)
+	for _, v := range tags {
+		if v == "elastic" {
+			return true
+		}
+	}
+	return false
+}
+
+func getXTags(schema *openapi3.Schema) []string {
+	if len(schema.Extensions) == 0 {
+		return nil
+	}
+	var v []string
+	for key, ext := range schema.Extensions {
+		if key == "x-tags" {
+			var s string
+			var e []string
+			err := json.Unmarshal(ext.(json.RawMessage), &s)
+			if err != nil {
+				if err := json.Unmarshal(ext.(json.RawMessage), &e); err != nil {
+					panic(err)
+				}
+			} else {
+				e = append(e, s)
+			}
+			v = append(v, e...)
+		}
+	}
+	return v
 }
 
 // Generates type definitions for any custom types defined in the
@@ -469,6 +618,36 @@ func GenerateTypes(t *template.Template, types []TypeDefinition) (string, error)
 	}
 
 	err := t.ExecuteTemplate(w, "typedef.tmpl", context)
+	if err != nil {
+		return "", errors.Wrap(err, "error generating types")
+	}
+	err = w.Flush()
+	if err != nil {
+		return "", errors.Wrap(err, "error flushing output buffer for types")
+	}
+	return buf.String(), nil
+}
+
+// GenerateEsTemplate do generate src based on template
+func GenerateEsTemplate(t *template.Template, types []TypeDefinition) (string, error) {
+	var buf bytes.Buffer
+	w := bufio.NewWriter(&buf)
+
+	context := struct {
+		Types []TypeDefinition
+	}{
+		Types: types,
+	}
+	var newContext struct {
+		Types []TypeDefinition
+	}
+	for _, v := range context.Types {
+		if v.Schema.EsTemplateDecl() != "" {
+			v.Schema.EsTemplate = fmt.Sprintf(`{ "mapping": {%s}}`, v.Schema.EsTemplate)
+			newContext.Types = append(newContext.Types, v)
+		}
+	}
+	err := t.ExecuteTemplate(w, "estemplate.tmpl", newContext)
 	if err != nil {
 		return "", errors.Wrap(err, "error generating types")
 	}

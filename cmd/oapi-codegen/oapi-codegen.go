@@ -41,8 +41,8 @@ func main() {
 		templatesDir string
 	)
 	flag.StringVar(&packageName, "package", "", "The package name for generated code")
-	flag.StringVar(&generate, "generate", "types,client,server,spec",
-		`Comma-separated list of code to generate; valid options: "types", "client", "chi-server", "server", "spec", "skip-fmt", "skip-prune"`)
+	flag.StringVar(&generate, "generate", "types,estemplate,client,server,spec",
+		`Comma-separated list of code to generate; valid options: "types", "estemplate", "client", "chi-server", "server", "spec", "skip-fmt", "skip-prune"`)
 	flag.StringVar(&outputFile, "o", "", "Where to output generated code, stdout is default")
 	flag.StringVar(&includeTags, "include-tags", "", "Only include operations with the given tags. Comma-separated list of tags.")
 	flag.StringVar(&excludeTags, "exclude-tags", "", "Exclude operations that are tagged with the given tags. Comma-separated list of tags.")
@@ -75,6 +75,8 @@ func main() {
 			opts.GenerateEchoServer = true
 		case "types":
 			opts.GenerateTypes = true
+		case "estemplate":
+			opts.GenerateEsTemplate = true
 		case "spec":
 			opts.EmbedSpec = true
 		case "skip-fmt":
@@ -111,6 +113,11 @@ func main() {
 		errExit("error generating code: %s\n", err)
 	}
 
+	esCode, err := codegen.GenerateEs(swagger, packageName, opts)
+	if err != nil {
+		errExit("error generating code: %s\n", err)
+	}
+
 	if outputFile != "" {
 		err = ioutil.WriteFile(outputFile, []byte(code), 0644)
 		if err != nil {
@@ -118,6 +125,12 @@ func main() {
 		}
 	} else {
 		fmt.Println(code)
+	}
+	if esCode != "" {
+		err = ioutil.WriteFile("es-index-template.json", []byte(esCode), 0644)
+		if err != nil {
+			errExit("error writing generated code to file: %s", err)
+		}
 	}
 }
 
