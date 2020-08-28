@@ -91,7 +91,7 @@ var (
 // Uses the Go templating engine to generate all of our server wrappers from
 // the descriptions we've built up above from the schema objects.
 // opts defines
-func Generate(swagger *openapi3.Swagger, packageName string, opts Options) (string, error) {
+func Generate(swagger *openapi3.Swagger, packageName string, opts Options) (string, string, error) {
 	filterOperationsByTag(swagger, opts)
 	if !opts.SkipPrune {
 		pruneUnusedComponents(swagger)
@@ -103,7 +103,7 @@ func Generate(swagger *openapi3.Swagger, packageName string, opts Options) (stri
 	// above
 	t, err := templates.Parse(t)
 	if err != nil {
-		return "", errors.Wrap(err, "error parsing oapi-codegen templates")
+		return "", "", errors.Wrap(err, "error parsing oapi-codegen templates")
 	}
 
 	// Override built-in templates with user-provided versions
@@ -111,21 +111,29 @@ func Generate(swagger *openapi3.Swagger, packageName string, opts Options) (stri
 		if _, ok := opts.UserTemplates[tpl.Name()]; ok {
 			utpl := t.New(tpl.Name())
 			if _, err := utpl.Parse(opts.UserTemplates[tpl.Name()]); err != nil {
-				return "", errors.Wrapf(err, "error parsing user-provided template %q", tpl.Name())
+				return "", "", errors.Wrapf(err, "error parsing user-provided template %q", tpl.Name())
 			}
 		}
 	}
 
 	ops, err := OperationDefinitions(swagger)
 	if err != nil {
-		return "", errors.Wrap(err, "error creating operation definitions")
+		return "", "", errors.Wrap(err, "error creating operation definitions")
 	}
 
 	var typeDefinitions string
 	if opts.GenerateTypes {
 		typeDefinitions, err = GenerateTypeDefinitions(t, swagger, ops)
 		if err != nil {
-			return "", errors.Wrap(err, "error generating type definitions")
+			return "", "", errors.Wrap(err, "error generating type definitions")
+		}
+	}
+
+	var indicesDefitions string
+	if opts.GenerateEsTemplate {
+		indicesDefitions, err = GenerateEsTemplateDefinitions(t, swagger, ops)
+		if err != nil {
+			return "", "", errors.Wrap(err, "error generating elastic search index template definitions")
 		}
 	}
 
@@ -133,7 +141,7 @@ func Generate(swagger *openapi3.Swagger, packageName string, opts Options) (stri
 	if opts.GenerateEchoServer {
 		echoServerOut, err = GenerateEchoServer(t, ops)
 		if err != nil {
-			return "", errors.Wrap(err, "error generating Go handlers for Paths")
+			return "", "", errors.Wrap(err, "error generating Go handlers for Paths")
 		}
 	}
 
@@ -141,7 +149,7 @@ func Generate(swagger *openapi3.Swagger, packageName string, opts Options) (stri
 	if opts.GenerateChiServer {
 		chiServerOut, err = GenerateChiServer(t, ops)
 		if err != nil {
-			return "", errors.Wrap(err, "error generating Go handlers for Paths")
+			return "", "", errors.Wrap(err, "error generating Go handlers for Paths")
 		}
 	}
 
@@ -149,7 +157,7 @@ func Generate(swagger *openapi3.Swagger, packageName string, opts Options) (stri
 	if opts.GenerateClient {
 		clientOut, err = GenerateClient(t, ops)
 		if err != nil {
-			return "", errors.Wrap(err, "error generating client")
+			return "", "", errors.Wrap(err, "error generating client")
 		}
 	}
 
@@ -157,7 +165,7 @@ func Generate(swagger *openapi3.Swagger, packageName string, opts Options) (stri
 	if opts.GenerateClient {
 		clientWithResponsesOut, err = GenerateClientWithResponses(t, ops)
 		if err != nil {
-			return "", errors.Wrap(err, "error generating client with responses")
+			return "", "", errors.Wrap(err, "error generating client with responses")
 		}
 	}
 
@@ -165,22 +173,23 @@ func Generate(swagger *openapi3.Swagger, packageName string, opts Options) (stri
 	if opts.EmbedSpec {
 		inlinedSpec, err = GenerateInlinedSpec(t, swagger)
 		if err != nil {
-			return "", errors.Wrap(err, "error generating Go handlers for Paths")
+			return "", "", errors.Wrap(err, "error generating Go handlers for Paths")
 		}
 	}
 
 	// Imports needed for the generated code to compile
 	var imports []string
 
-	var buf bytes.Buffer
+	var buf, es bytes.Buffer
 	w := bufio.NewWriter(&buf)
+	i := bufio.NewWriter(&es)
 
 	// Based on module prefixes, figure out which optional imports are required.
 	for _, str := range []string{typeDefinitions, chiServerOut, echoServerOut, clientOut, clientWithResponsesOut, inlinedSpec} {
 		for _, goImport := range allGoImports {
 			match, err := regexp.MatchString(fmt.Sprintf("[^a-zA-Z0-9_]%s", goImport.lookFor), str)
 			if err != nil {
-				return "", errors.Wrap(err, "error figuring out imports")
+				return "", "", errors.Wrap(err, "error figuring out imports")
 			}
 			if match {
 				imports = append(imports, goImport.String())
@@ -190,71 +199,99 @@ func Generate(swagger *openapi3.Swagger, packageName string, opts Options) (stri
 
 	importsOut, err := GenerateImports(t, imports, packageName)
 	if err != nil {
-		return "", errors.Wrap(err, "error generating imports")
+		return "", "", errors.Wrap(err, "error generating imports")
 	}
 
 	_, err = w.WriteString(importsOut)
 	if err != nil {
-		return "", errors.Wrap(err, "error writing imports")
+		return "", "", errors.Wrap(err, "error writing imports")
 	}
 
 	_, err = w.WriteString(typeDefinitions)
 	if err != nil {
-		return "", errors.Wrap(err, "error writing type definitions")
+		return "", "", errors.Wrap(err, "error writing type definitions")
 
 	}
 
 	if opts.GenerateClient {
 		_, err = w.WriteString(clientOut)
 		if err != nil {
-			return "", errors.Wrap(err, "error writing client")
+			return "", "", errors.Wrap(err, "error writing client")
 		}
 		_, err = w.WriteString(clientWithResponsesOut)
 		if err != nil {
-			return "", errors.Wrap(err, "error writing client")
+			return "", "", errors.Wrap(err, "error writing client")
 		}
 	}
 
 	if opts.GenerateEchoServer {
 		_, err = w.WriteString(echoServerOut)
 		if err != nil {
-			return "", errors.Wrap(err, "error writing server path handlers")
+			return "", "", errors.Wrap(err, "error writing server path handlers")
 		}
 	}
 
 	if opts.GenerateChiServer {
 		_, err = w.WriteString(chiServerOut)
 		if err != nil {
-			return "", errors.Wrap(err, "error writing server path handlers")
+			return "", "", errors.Wrap(err, "error writing server path handlers")
 		}
 	}
 
 	if opts.EmbedSpec {
 		_, err = w.WriteString(inlinedSpec)
 		if err != nil {
-			return "", errors.Wrap(err, "error writing inlined spec")
+			return "", "", errors.Wrap(err, "error writing inlined spec")
+		}
+	}
+
+	if opts.GenerateEsTemplate {
+		_, err = i.WriteString(indicesDefitions)
+		if err != nil {
+			return "", "", errors.Wrap(err, "error writing imports")
+		}
+		err = i.Flush()
+		if err != nil {
+			return "", "", errors.Wrap(err, "error flushing output buffer")
 		}
 	}
 
 	err = w.Flush()
 	if err != nil {
-		return "", errors.Wrap(err, "error flushing output buffer")
+		return "", "", errors.Wrap(err, "error flushing output buffer")
 	}
 
 	// remove any byte-order-marks which break Go-Code
 	goCode := SanitizeCode(buf.String())
-
+	esCode := SanitizeCode(es.String())
 	// The generation code produces unindented horrors. Use the Go formatter
 	// to make it all pretty.
 	if opts.SkipFmt {
-		return goCode, nil
+		return goCode, "", nil
 	}
 	outBytes, err := format.Source([]byte(goCode))
 	if err != nil {
 		fmt.Println(goCode)
-		return "", errors.Wrap(err, "error formatting Go code")
+		return "", "", errors.Wrap(err, "error formatting Go code")
 	}
-	return string(outBytes), nil
+	// format json file
+	// Some trick in here
+	// if we have data like "a": {"type": "nested", "type": "text"}
+	// this is incorrect format data. json.Unmarshal will do parse data to "a": {"type": "text"}
+	if esCode != "" {
+		var temp interface{}
+		if err = json.Unmarshal([]byte(esCode), &temp); err != nil {
+			fmt.Println(esCode)
+			return "", "", errors.Wrap(err, "error encoding Es template")
+		}
+		outEs, err := json.MarshalIndent(temp, "", "    ")
+		if err != nil {
+			fmt.Println(temp)
+			return "", "", errors.Wrap(err, "error formatting Es template")
+		}
+		esCode = string(outEs)
+	}
+	return string(outBytes), esCode, nil
 }
 
 func GenerateTypeDefinitions(t *template.Template, swagger *openapi3.Swagger, ops []OperationDefinition) (string, error) {
@@ -323,79 +360,6 @@ func GenerateTypeDefinitions(t *template.Template, swagger *openapi3.Swagger, op
 
 	typeDefinitions := strings.Join([]string{typesOut, paramTypesOut, allOfBoilerplate}, "")
 	return typeDefinitions, nil
-}
-
-// GenerateEs do generate Estemplate
-func GenerateEs(swagger *openapi3.Swagger, packageName string, opts Options) (string, error) {
-	filterOperationsByTag(swagger, opts)
-	if !opts.SkipPrune {
-		pruneUnusedComponents(swagger)
-	}
-
-	// This creates the golang templates text package
-	t := template.New("oapi-codegen").Funcs(TemplateFunctions)
-	// This parses all of our own template files into the template object
-	// above
-	t, err := templates.Parse(t)
-	if err != nil {
-		return "", errors.Wrap(err, "error parsing oapi-codegen templates")
-	}
-
-	// Override built-in templates with user-provided versions
-	for _, tpl := range t.Templates() {
-		if _, ok := opts.UserTemplates[tpl.Name()]; ok {
-			utpl := t.New(tpl.Name())
-			if _, err := utpl.Parse(opts.UserTemplates[tpl.Name()]); err != nil {
-				return "", errors.Wrapf(err, "error parsing user-provided template %q", tpl.Name())
-			}
-		}
-	}
-
-	ops, err := OperationDefinitions(swagger)
-	if err != nil {
-		return "", errors.Wrap(err, "error creating operation definitions")
-	}
-
-	var indicesDefitions string
-	if opts.GenerateTypes {
-		indicesDefitions, err = GenerateEsTemplateDefinitions(t, swagger, ops)
-		if err != nil {
-			return "", errors.Wrap(err, "error generating type definitions")
-		}
-	}
-
-	var es bytes.Buffer
-	i := bufio.NewWriter(&es)
-
-	_, err = i.WriteString(indicesDefitions)
-	if err != nil {
-		return "", errors.Wrap(err, "error writing imports")
-	}
-
-	err = i.Flush()
-	if err != nil {
-		return "", errors.Wrap(err, "error flushing output buffer")
-	}
-
-	esCode := SanitizeCode(es.String())
-	// format json file
-	// Some trick in here
-	// if we have data like "a": {"type": "nested", "type": "text"}
-	// this is incorrect format data. json.Unmarshal will do parse data to "a": {"type": "text"}
-	if esCode != "" {
-		var temp interface{}
-		if err = json.Unmarshal([]byte(esCode), &temp); err != nil {
-			fmt.Println(esCode)
-			return "", errors.Wrap(err, "error encoding Es template")
-		}
-		outEs, err := json.MarshalIndent(temp, "", "    ")
-		if err != nil {
-			fmt.Println(temp)
-			return "", errors.Wrap(err, "error formatting Es template")
-		}
-		esCode = string(outEs)
-	}
-	return esCode, nil
 }
 
 // GenerateEsTemplateDefinitions do generate definition for es template

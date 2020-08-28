@@ -108,12 +108,7 @@ func main() {
 	}
 	opts.UserTemplates = templates
 
-	code, err := codegen.Generate(swagger, packageName, opts)
-	if err != nil {
-		errExit("error generating code: %s\n", err)
-	}
-
-	esCode, err := codegen.GenerateEs(swagger, packageName, opts)
+	code, esCode, err := codegen.Generate(swagger, packageName, opts)
 	if err != nil {
 		errExit("error generating code: %s\n", err)
 	}
