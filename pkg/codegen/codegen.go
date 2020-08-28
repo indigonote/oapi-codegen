@@ -28,7 +28,7 @@ import (
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/pkg/errors"
 
-	"sios.tech/indigo/oapi-codegen/pkg/codegen/templates"
+	"github.com/indigonote/oapi-codegen/pkg/codegen/templates"
 )
 
 // Options defines the optional code to generate.

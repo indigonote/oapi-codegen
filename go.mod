@@ -1,4 +1,4 @@
-module sios.tech/indigo/oapi-codegen
+module github.com/indigonote/oapi-codegen
 
 require (
 	github.com/cyberdelia/templates v0.0.0-20141128023046-ca7fffd4298c

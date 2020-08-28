@@ -17,4 +17,4 @@ package internal
 // server. The file petstore.gen.go is automatically generated from the schema
 
 // Run oapi-codegen to regenerate the petstore boilerplate
-//go:generate go run sios.tech/indigo/oapi-codegen/cmd/oapi-codegen --package=petstore --generate types,client -o ../petstore-client.gen.go ../petstore-expanded.yaml
+//go:generate go run github.com/indigonote/oapi-codegen/cmd/oapi-codegen --package=petstore --generate types,client -o ../petstore-client.gen.go ../petstore-expanded.yaml

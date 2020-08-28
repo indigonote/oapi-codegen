@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"sios.tech/indigo/oapi-codegen/internal/test/client"
+	"github.com/indigonote/oapi-codegen/internal/test/client"
 )
 
 var (

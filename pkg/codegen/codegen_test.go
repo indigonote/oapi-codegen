@@ -10,8 +10,8 @@ import (
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/golangci/lint-1"
 	"github.com/stretchr/testify/assert"
-	examplePetstoreClient "sios.tech/indigo/oapi-codegen/examples/petstore-expanded"
-	examplePetstore "sios.tech/indigo/oapi-codegen/examples/petstore-expanded/echo/api"
+	examplePetstoreClient "github.com/indigonote/oapi-codegen/examples/petstore-expanded"
+	examplePetstore "github.com/indigonote/oapi-codegen/examples/petstore-expanded/echo/api"
 )
 
 func TestExamplePetStoreCodeGeneration(t *testing.T) {

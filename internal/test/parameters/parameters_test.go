@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"sios.tech/indigo/oapi-codegen/pkg/testutil"
+	"github.com/indigonote/oapi-codegen/pkg/testutil"
 )
 
 type testServer struct {

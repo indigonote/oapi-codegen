@@ -22,8 +22,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"sios.tech/indigo/oapi-codegen/pkg/codegen"
-	"sios.tech/indigo/oapi-codegen/pkg/util"
+	"github.com/indigonote/oapi-codegen/pkg/codegen"
+	"github.com/indigonote/oapi-codegen/pkg/util"
 )
 
 func errExit(format string, args ...interface{}) {

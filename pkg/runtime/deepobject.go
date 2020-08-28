@@ -12,7 +12,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"sios.tech/indigo/oapi-codegen/pkg/types"
+	"github.com/indigonote/oapi-codegen/pkg/types"
 )
 
 func marshalDeepObject(in interface{}, path []string) ([]string, error) {

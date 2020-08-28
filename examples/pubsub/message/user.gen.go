@@ -5,6 +5,7 @@ package message
 
 // User defines model for User.
 type User struct {
-	Id   string `json:"id" validate:"required"`
-	Name string `json:"name" validate:"min=1,max=13,required"`
+	Id   string `json:"id"`
+	Name string `json:"name" validate:"min=1,max=13"`
 }
+
