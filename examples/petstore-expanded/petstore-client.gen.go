@@ -34,7 +34,7 @@ type NewPet struct {
 	Size int     `json:"size" validate:"min=0,max=20"`
 
 	// Type of the pet
-	Tag *string `json:"tag,omitempty" validate:"omitempty,min=2,max=32,regex=^[A-Za-z]+"`
+	Tag *string `json:"tag,omitempty" validate:"omitempty,regex=^[A-Za-z]+,min=2,max=32"`
 }
 
 // Pet defines model for Pet.

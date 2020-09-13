@@ -1,0 +1,416 @@
+{
+    "FhirCodeSystem": {
+        "mapping": {
+            "properties": {
+                "concept": {
+                    "type": "nested"
+                },
+                "content": {
+                    "type": "text"
+                },
+                "id": {
+                    "type": "keyword"
+                },
+                "name": {
+                    "type": "text"
+                },
+                "status": {
+                    "type": "text"
+                },
+                "title": {
+                    "type": "text"
+                }
+            }
+        }
+    },
+    "FhirEncounter": {
+        "mapping": {
+            "properties": {
+                "class": {
+                    "properties": {
+                        "code": {
+                            "type": "text"
+                        },
+                        "system": {
+                            "type": "text"
+                        }
+                    }
+                },
+                "id": {
+                    "type": "keyword"
+                },
+                "meta": {
+                    "properties": {
+                        "extension": {
+                            "properties": {
+                                "url": {
+                                    "type": "text"
+                                },
+                                "valueAttachment": {
+                                    "properties": {
+                                        "contentType": {
+                                            "type": "text"
+                                        },
+                                        "creation": {
+                                            "type": "date"
+                                        },
+                                        "data": {
+                                            "type": "text"
+                                        },
+                                        "hash": {
+                                            "type": "text"
+                                        },
+                                        "language": {
+                                            "type": "text"
+                                        },
+                                        "size": {
+                                            "type": "text"
+                                        },
+                                        "title": {
+                                            "type": "text"
+                                        },
+                                        "url": {
+                                            "type": "text"
+                                        }
+                                    }
+                                },
+                                "valueCode": {
+                                    "type": "text"
+                                },
+                                "valueInstant": {
+                                    "type": "text"
+                                },
+                                "valueReference": {
+                                    "properties": {
+                                        "reference": {
+                                            "type": "text"
+                                        },
+                                        "type": {
+                                            "type": "text"
+                                        }
+                                    }
+                                },
+                                "valueString": {
+                                    "type": "text"
+                                }
+                            },
+                            "type": "nested"
+                        },
+                        "lastUpdated": {
+                            "type": "text"
+                        },
+                        "versionId": {
+                            "type": "text"
+                        }
+                    }
+                },
+                "participant": {
+                    "properties": {
+                        "individual": {
+                            "properties": {
+                                "reference": {
+                                    "type": "text"
+                                },
+                                "type": {
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        "type": {
+                            "properties": {
+                                "coding": {
+                                    "properties": {
+                                        "code": {
+                                            "type": "text"
+                                        },
+                                        "system": {
+                                            "type": "text"
+                                        }
+                                    },
+                                    "type": "nested"
+                                }
+                            },
+                            "type": "nested"
+                        }
+                    },
+                    "type": "nested"
+                },
+                "status": {
+                    "type": "text"
+                }
+            }
+        }
+    },
+    "FhirPatient": {
+        "mapping": {
+            "properties": {
+                "active": {
+                    "type": "boolean"
+                },
+                "address": {
+                    "properties": {
+                        "country": {
+                            "type": "text"
+                        },
+                        "postalCode": {
+                            "type": "text"
+                        },
+                        "text": {
+                            "type": "text"
+                        }
+                    },
+                    "type": "nested"
+                },
+                "birthDate": {
+                    "type": "date"
+                },
+                "extension": {
+                    "properties": {
+                        "url": {
+                            "type": "text"
+                        },
+                        "valueAttachment": {
+                            "properties": {
+                                "contentType": {
+                                    "type": "text"
+                                },
+                                "creation": {
+                                    "type": "date"
+                                },
+                                "data": {
+                                    "type": "text"
+                                },
+                                "hash": {
+                                    "type": "text"
+                                },
+                                "language": {
+                                    "type": "text"
+                                },
+                                "size": {
+                                    "type": "text"
+                                },
+                                "title": {
+                                    "type": "text"
+                                },
+                                "url": {
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        "valueCode": {
+                            "type": "text"
+                        },
+                        "valueInstant": {
+                            "type": "text"
+                        },
+                        "valueReference": {
+                            "properties": {
+                                "reference": {
+                                    "type": "text"
+                                },
+                                "type": {
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        "valueString": {
+                            "type": "text"
+                        }
+                    },
+                    "type": "nested"
+                },
+                "gender": {
+                    "type": "keyword"
+                },
+                "generalPractitioner": {
+                    "properties": {
+                        "reference": {
+                            "type": "text"
+                        },
+                        "type": {
+                            "type": "text"
+                        }
+                    },
+                    "type": "nested"
+                },
+                "id": {
+                    "type": "keyword"
+                },
+                "identifier": {
+                    "properties": {
+                        "system": {
+                            "type": "text"
+                        },
+                        "use": {
+                            "type": "text"
+                        },
+                        "value": {
+                            "type": "text"
+                        }
+                    },
+                    "type": "nested"
+                },
+                "link": {
+                    "properties": {
+                        "other": {
+                            "properties": {
+                                "reference": {
+                                    "type": "text"
+                                },
+                                "type": {
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        "type": {
+                            "type": "text"
+                        }
+                    },
+                    "type": "nested"
+                },
+                "meta": {
+                    "properties": {
+                        "extension": {
+                            "properties": {
+                                "url": {
+                                    "type": "text"
+                                },
+                                "valueAttachment": {
+                                    "properties": {
+                                        "contentType": {
+                                            "type": "text"
+                                        },
+                                        "creation": {
+                                            "type": "date"
+                                        },
+                                        "data": {
+                                            "type": "text"
+                                        },
+                                        "hash": {
+                                            "type": "text"
+                                        },
+                                        "language": {
+                                            "type": "text"
+                                        },
+                                        "size": {
+                                            "type": "text"
+                                        },
+                                        "title": {
+                                            "type": "text"
+                                        },
+                                        "url": {
+                                            "type": "text"
+                                        }
+                                    }
+                                },
+                                "valueCode": {
+                                    "type": "text"
+                                },
+                                "valueInstant": {
+                                    "type": "text"
+                                },
+                                "valueReference": {
+                                    "properties": {
+                                        "reference": {
+                                            "type": "text"
+                                        },
+                                        "type": {
+                                            "type": "text"
+                                        }
+                                    }
+                                },
+                                "valueString": {
+                                    "type": "text"
+                                }
+                            },
+                            "type": "nested"
+                        },
+                        "lastUpdated": {
+                            "type": "text"
+                        },
+                        "versionId": {
+                            "type": "text"
+                        }
+                    }
+                },
+                "name": {
+                    "properties": {
+                        "extension": {
+                            "properties": {
+                                "url": {
+                                    "type": "text"
+                                },
+                                "valueAttachment": {
+                                    "properties": {
+                                        "contentType": {
+                                            "type": "text"
+                                        },
+                                        "creation": {
+                                            "type": "date"
+                                        },
+                                        "data": {
+                                            "type": "text"
+                                        },
+                                        "hash": {
+                                            "type": "text"
+                                        },
+                                        "language": {
+                                            "type": "text"
+                                        },
+                                        "size": {
+                                            "type": "text"
+                                        },
+                                        "title": {
+                                            "type": "text"
+                                        },
+                                        "url": {
+                                            "type": "text"
+                                        }
+                                    }
+                                },
+                                "valueCode": {
+                                    "type": "text"
+                                },
+                                "valueInstant": {
+                                    "type": "text"
+                                },
+                                "valueReference": {
+                                    "properties": {
+                                        "reference": {
+                                            "type": "text"
+                                        },
+                                        "type": {
+                                            "type": "text"
+                                        }
+                                    }
+                                },
+                                "valueString": {
+                                    "type": "text"
+                                }
+                            },
+                            "type": "nested"
+                        },
+                        "text": {
+                            "type": "text"
+                        },
+                        "use": {
+                            "type": "text"
+                        }
+                    },
+                    "type": "nested"
+                },
+                "telecom": {
+                    "properties": {
+                        "system": {
+                            "type": "text"
+                        },
+                        "value": {
+                            "type": "text"
+                        }
+                    },
+                    "type": "nested"
+                }
+            }
+        }
+    }
+}

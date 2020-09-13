@@ -1,0 +1,583 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Swagger Petstore
+  description: A sample API that uses a petstore as an example to demonstrate features in the OpenAPI 3.0 specification
+  termsOfService: 'http://swagger.io/terms/'
+  contact:
+    name: Swagger API Team
+    email: apiteam@swagger.io
+    url: 'http://swagger.io'
+  license:
+    name: Apache 2.0
+    url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
+servers:
+  - url: 'http://petstore.swagger.io/api'
+paths:
+  /consulters:
+    post:
+      summary: Post Consulters
+      operationId: post-consulters
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/consulter-create-response'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/consulter-create-request'
+      description: Create Consulters
+      tags:
+        - consulters
+components:
+  schemas:
+    consulter-create-request:
+      title: consulter-create-request
+      type: object
+      properties:
+        consulters:
+          type: array
+          items:
+            $ref: '#/components/schemas/create-consulter'
+      description: Consulter create request data
+    create-consulter:
+      title: create-consulter
+      type: object
+      properties:
+        consulter:
+          $ref: '#/components/schemas/fhir-patient'
+        consultation:
+          $ref: '#/components/schemas/fhir-encounter'
+        codesystem:
+          $ref: '#/components/schemas/fhir-code-system'
+      description: Consulter object use for create
+    fhir-patient:
+      title: fhir-patient
+      type: object
+      description: FHIR Patient
+      properties:
+        id:
+          type: string
+          description: id of patient
+          nullable: true
+          x-go-custom-tag:
+            - fhirID
+          x-es-tag:
+            - keyword
+        meta:
+          $ref: '#/components/schemas/fhir-meta'
+        identifier:
+          type: array
+          description: list identifier of patient
+          items:
+            $ref: '#/components/schemas/fhir-identifier'
+        active:
+          type: boolean
+          description: active status of patient
+          nullable: true
+          x-es-tag:
+            - boolean
+        name:
+          type: array
+          description: name of patient
+          items:
+            $ref: '#/components/schemas/fhir-human-name'
+        telecom:
+          type: array
+          description: telecom of patient
+          items:
+            $ref: '#/components/schemas/fhir-contact-point'
+        gender:
+          type: string
+          enum:
+            - male
+            - female
+            - other
+            - unknown
+          description: 'gender of patient: male | female | other | unknown'
+          nullable: true
+          x-es-tag:
+            - keyword
+        birthDate:
+          type: string
+          description: birth date of patient
+          nullable: true
+          x-go-custom-tag:
+            - fhirDate
+          x-es-tag:
+            - date
+        address:
+          type: array
+          description: list address of patient
+          items:
+            $ref: '#/components/schemas/fhir-address'
+        generalPractitioner:
+          type: array
+          description: list general practitioner
+          items:
+            $ref: '#/components/schemas/fhir-reference'
+        link:
+          type: array
+          description: Link to another patient resource that concerns the same actual person
+          items:
+            type: object
+            properties:
+              other:
+                $ref: '#/components/schemas/fhir-reference'
+              type:
+                type: string
+                enum:
+                  - replaced-by
+                  - replaces
+                description: 'type reference: replaced-by | replaces'
+                x-es-tag:
+                  - text
+            required:
+              - other
+              - type
+        extension:
+          type: array
+          description: Additional contents of patient
+          items:
+            $ref: '#/components/schemas/fhir-extension'
+      x-tags:
+        - elastic
+    fhir-encounter:
+      title: fhir-encounter
+      type: object
+      description: FHIR Encounter
+      properties:
+        id:
+          type: string
+          nullable: true
+          x-go-custom-tag:
+            - fhirID
+          x-es-tag:
+            - keyword
+        meta:
+          $ref: '#/components/schemas/fhir-meta'
+        status:
+          type: string
+          enum:
+            - planned
+            - arrived
+            - triaged
+            - in-progress
+            - onleave
+            - finished
+            - cancelled
+            - entered-in-error
+            - unknown
+          description: 'planned | arrived | triaged | in-progress | onleave | finished | cancelled | entered-in-error | unknown'
+          x-es-tag:
+            - text
+        class:
+          $ref: '#/components/schemas/fhir-coding'
+        participant:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: array
+                items:
+                  $ref: '#/components/schemas/fhir-codeable-concept'
+              individual:
+                $ref: '#/components/schemas/fhir-reference'
+      required:
+        - status
+        - class
+      x-tags:
+        - elastic
+    fhir-address:
+      title: fhir-address
+      type: object
+      properties:
+        text:
+          type: string
+          nullable: true
+          maxLength: 1048576
+          x-go-custom-tag:
+            - fhirString
+          x-es-tag:
+            - text
+        country:
+          type: string
+          nullable: true
+          maxLength: 1048576
+          x-go-custom-tag:
+            - fhirString
+          x-es-tag:
+            - text
+        postalCode:
+          type: string
+          nullable: true
+          maxLength: 1048576
+          x-go-custom-tag:
+            - fhirString
+          x-es-tag:
+            - text
+      description: FHIR Address
+    fhir-extension:
+      type: object
+      title: fhir-extension
+      description: FHIR Extension
+      maxProperties: 2
+      properties:
+        url:
+          type: string
+          x-go-custom-tag:
+            - fhirUri
+          x-es-tag:
+            - text
+        valueCode:
+          type: string
+          nullable: true
+          x-go-custom-tag:
+            - fhirCode
+            - fhirValueX
+          x-es-tag:
+            - text
+        valueString:
+          type: string
+          nullable: true
+          maxLength: 1048576
+          x-go-custom-tag:
+            - fhirString
+            - fhirValueX
+          x-es-tag:
+            - text
+        valueAttachment:
+          allOf:
+            - $ref: '#/components/schemas/fhir-attachment'
+          nullable: true
+          x-go-custom-tag:
+            - fhirValueX
+        valueReference:
+          allOf:
+            - $ref: '#/components/schemas/fhir-reference'
+          nullable: true
+          x-go-custom-tag:
+            - fhirValueX
+        valueInstant:
+          type: string
+          nullable: true
+          x-go-custom-tag:
+            - fhirInstant
+            - fhirValueX
+          x-es-tag:
+            - text
+      required:
+        - url
+    fhir-coding:
+      title: fhir-coding
+      type: object
+      properties:
+        system:
+          type: string
+          nullable: true
+          x-go-custom-tag:
+            - fhirUri
+          x-es-tag:
+            - text
+        code:
+          type: string
+          nullable: true
+          x-go-custom-tag:
+            - fhirCode
+          x-es-tag:
+            - text
+      description: FHIR Coding
+    fhir-identifier:
+      title: fhir-identifier
+      type: object
+      properties:
+        system:
+          type: string
+          nullable: true
+          x-go-custom-tag:
+            - fhirUri
+          x-es-tag:
+            - text
+        value:
+          type: string
+          nullable: true
+          maxLength: 1048576
+          x-go-custom-tag:
+            - fhirString
+          x-es-tag:
+            - text
+        use:
+          type: string
+          enum:
+            - usual
+            - official
+          nullable: true
+          x-es-tag:
+            - text
+      description: FHIR Identifier
+    fhir-meta:
+      title: fhir-meta
+      type: object
+      description: FHIR Meta
+      nullable: true
+      properties:
+        lastUpdated:
+          type: string
+          nullable: true
+          x-go-custom-tag:
+            - fhirInstant
+          x-es-tag:
+            - text
+        extension:
+          type: array
+          items:
+            $ref: '#/components/schemas/fhir-extension'
+        versionId:
+          type: string
+          x-go-custom-tag:
+            - fhirID
+          x-es-tag:
+            - text
+    fhir-codeable-concept:
+      title: fhir-codeable-concept
+      type: object
+      description: FHIR Codeable Concept
+      properties:
+        coding:
+          type: array
+          items:
+            $ref: '#/components/schemas/fhir-coding'
+    fhir-contact-point:
+      title: fhir-contact-point
+      type: object
+      properties:
+        system:
+          type: string
+          enum:
+            - phone
+            - email
+          nullable: true
+          x-es-tag:
+            - text
+        value:
+          type: string
+          nullable: true
+          maxLength: 1048576
+          x-go-custom-tag:
+            - fhirString
+          x-es-tag:
+            - text
+      description: FHIR Contact Point
+    fhir-reference:
+      title: fhir-reference
+      type: object
+      properties:
+        reference:
+          type: string
+          nullable: true
+          maxLength: 1048576
+          x-go-custom-tag:
+            - fhirString
+          x-es-tag:
+            - text
+        type:
+          type: string
+          nullable: true
+          x-go-custom-tag:
+            - fhirUri
+          x-es-tag:
+            - text
+      description: FHIR Reference
+      nullable: true
+    fhir-human-name:
+      title: fhir-human-name
+      type: object
+      properties:
+        use:
+          type: string
+          enum:
+            - usual
+            - official
+          nullable: true
+          x-es-tag:
+            - text
+        text:
+          type: string
+          nullable: true
+          maxLength: 1048576
+          x-go-custom-tag:
+            - fhirString
+          x-es-tag:
+            - text
+        extension:
+          type: array
+          items:
+            $ref: '#/components/schemas/fhir-extension'
+      description: FHIR Human Name
+    fhir-attachment:
+      title: fhir-attachment
+      type: object
+      description: FHIR Attachment
+      nullable: true
+      properties:
+        contentType:
+          type: string
+          description: 'Mime type of the content, with charset etc.'
+          nullable: true
+          x-go-custom-tag:
+            - fhirCode
+          x-es-tag:
+            - text
+        language:
+          type: string
+          description: "\t\nThe human language of the content. The value can be any valid value according to BCP 47."
+          nullable: true
+          x-go-custom-tag:
+            - fhirCode
+          x-es-tag:
+            - text
+        data:
+          type: string
+          description: 'The actual data of the attachment - a sequence of bytes, base64 encoded.'
+          nullable: true
+          x-go-custom-tag:
+            - fhirBase64Binary
+          x-es-tag:
+            - text
+        url:
+          type: string
+          description: Uri where the data can be found
+          nullable: true
+          x-es-tag:
+            - text
+        size:
+          type: integer
+          description: 'The number of bytes of data that make up this attachment (before base64 encoding, if that is done).Number of bytes of content (if url provided)'
+          x-go-custom-tag:
+            - fhirUnsignedInt
+          x-es-tag:
+            - text
+        hash:
+          type: string
+          description: The calculated hash of the data using SHA-1. Represented using base64.
+          nullable: true
+          x-go-custom-tag:
+            - fhirBase64Binary
+          x-es-tag:
+            - text
+        title:
+          type: string
+          description: A label or set of text to display in place of the data.
+          nullable: true
+          maxLength: 1048576
+          x-go-custom-tag:
+            - fhirString
+          x-es-tag:
+            - text
+        creation:
+          type: string
+          description: The date that the attachment was first created.
+          nullable: true
+          x-go-custom-tag:
+            - fhirDateTime
+          x-es-tag:
+            - date
+    consulter-create-response:
+      $ref: '#/components/schemas/consulter-per-page'
+    consulter-per-page:
+      title: consulter-per-page
+      type: object
+      description: Consulter data with pagination
+      properties:
+        consulters:
+          type: array
+          description: consulter list
+          items:
+            $ref: '#/components/schemas/consulter'
+    consulter:
+      title: consulter
+      type: object
+      description: Consulter resource
+      properties:
+        consulter:
+          $ref: '#/components/schemas/fhir-patient'
+        consultationArticleCount:
+          type: number
+          description: consulter article count
+        consultation:
+          $ref: '#/components/schemas/fhir-encounter'
+    fhir-code-system:
+      title: fhir-code-system
+      type: object
+      properties:
+        id:
+          type: string
+          x-go-custom-tag:
+            - fhirID
+          x-es-tag:
+            - keyword
+        status:
+          type: string
+          enum:
+            - active
+          default: active
+          x-es-tag:
+            - text
+        content:
+          type: string
+          enum:
+            - complete
+          default: complete
+          x-es-tag:
+            - text
+        name:
+          type: string
+          maxLength: 1048576
+          x-go-custom-tag:
+            - fhirString
+          x-es-tag:
+            - text
+        title:
+          type: string
+          maxLength: 1048576
+          x-go-custom-tag:
+            - fhirString
+          x-es-tag:
+            - text
+        concept:
+          type: array
+          items:
+            $ref: '#/components/schemas/fhir-concept'
+      required:
+        - status
+        - content
+      x-tags:
+        - elastic
+    fhir-concept:
+      title: fhir-concept
+      type: object
+      properties:
+        code:
+          type: string
+          x-go-custom-tag:
+            - fhirCode
+          x-es-tag:
+            - text
+        display:
+          type: string
+          maxLength: 1048576
+          x-go-custom-tag:
+            - fhirString
+          x-es-tag:
+            - text
+        concept:
+          type: array
+          items:
+            $ref: '#/components/schemas/fhir-concept'
+      required:
+        - code

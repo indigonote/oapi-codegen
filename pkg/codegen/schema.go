@@ -11,8 +11,9 @@ import (
 
 // This describes a Schema, a type definition.
 type Schema struct {
-	GoType  string // The Go type needed to represent the schema
-	RefType string // If the type has a type name, this is set
+	GoType     string // The Go type needed to represent the schema
+	RefType    string // If the type has a type name, this is set
+	EsTemplate string // This field use for create es index template
 
 	EnumValues []string // Enum values
 
@@ -33,6 +34,10 @@ func (s Schema) TypeDecl() string {
 		return s.RefType
 	}
 	return s.GoType
+}
+
+func (s Schema) EsTemplateDecl() string {
+	return s.EsTemplate
 }
 
 func (s *Schema) MergeProperty(p Property) error {
@@ -62,6 +67,7 @@ type Property struct {
 	Required      bool
 	Nullable      bool
 	Validation    map[string]string
+	EsTag         string
 }
 
 func (p Property) GoFieldName() string {
@@ -212,6 +218,7 @@ func GenerateGoSchema(sref *openapi3.SchemaRef, path []string) (Schema, error) {
 				if err != nil {
 					return Schema{}, errors.Wrap(err, "error generating type for additional properties")
 				}
+				// TODO: implement es tag here
 				outSchema.AdditionalPropertiesType = &additionalSchema
 			}
 
@@ -275,6 +282,152 @@ func GenerateGoSchema(sref *openapi3.SchemaRef, path []string) (Schema, error) {
 				// All unrecognized formats are simply a regular string.
 				outSchema.GoType = "string"
 			}
+		default:
+			return Schema{}, fmt.Errorf("unhandled Schema type: %s", t)
+		}
+	}
+	return outSchema, nil
+}
+
+// GenerateEsSchema func do generate EsSchema
+func GenerateEsSchema(sref *openapi3.SchemaRef, path []string) (Schema, error) {
+	if sref == nil {
+		return Schema{}, nil
+	}
+
+	schema := sref.Value
+
+	if sref.Ref != "" {
+		// need generate json template for $ref field
+		// With go struct, we can only add $ref name like FhirPatient or FhirEncounter...
+		// But with es json template, we cannot use this format
+		template, err := GenEsTemplateFromReference(sref, path)
+		if err != nil {
+			return Schema{}, fmt.Errorf("error turning reference (%s) into a ElasticSearch index template: %s",
+				sref.Ref, err)
+		}
+		return Schema{
+			EsTemplate: template,
+		}, nil
+	}
+
+	// We can't support this in any meaningful way
+	if schema.AnyOf != nil {
+		return Schema{}, nil
+	}
+	// We can't support this in any meaningful way
+	if schema.OneOf != nil {
+		return Schema{}, nil
+	}
+
+	// AllOf is interesting, and useful. It's the union of a number of other
+	// schemas. A common usage is to create a union of an object with an ID,
+	// so that in a RESTful paradigm, the Create operation can return
+	// (object, id), so that other operations can refer to (id)
+	if schema.AllOf != nil {
+		mergedSchema, err := MergeSchemas(schema.AllOf, path)
+		if err != nil {
+			return Schema{}, errors.Wrap(err, "error merging schemas")
+		}
+		return mergedSchema, nil
+	}
+
+	// Schema type and format, eg. string / binary
+	t := schema.Type
+
+	outSchema := Schema{}
+	// Handle objects and empty schemas first as a special case
+	if t == "" || t == "object" {
+		if len(schema.Properties) == 0 && !SchemaHasAdditionalProperties(schema) {
+			return outSchema, nil
+		}
+		// We've got an object with some properties.
+		for _, pName := range SortedSchemaKeys(schema.Properties) {
+			p := schema.Properties[pName]
+			propertyPath := append(path, pName)
+			pSchema, err := GenerateEsSchema(p, propertyPath)
+			if err != nil {
+				return Schema{}, errors.Wrap(err, fmt.Sprintf("error generating Es schema for property '%s'", pName))
+			}
+			// TODO: implement later
+			// if pSchema.HasAdditionalProperties && pSchema.RefType == "" {
+			// 	// If we have fields present which have additional properties,
+			// 	// but are not a pre-defined type, we need to define a type
+			// 	// for them, which will be based on the field names we followed
+			// 	// to get to the type.
+			// 	typeName := PathToTypeName(propertyPath)
+
+			// 	typeDef := TypeDefinition{
+			// 		TypeName: typeName,
+			// 		JsonName: strings.Join(propertyPath, "."),
+			// 		Schema:   pSchema,
+			// 	}
+			// 	pSchema.AdditionalTypes = append(pSchema.AdditionalTypes, typeDef)
+
+			// 	pSchema.RefType = typeName
+			// }
+			e := parseEsType(p.Value)
+			prop := Property{
+				JsonFieldName: pName,
+				Schema:        pSchema,
+				EsTag:         e,
+			}
+			outSchema.Properties = append(outSchema.Properties, prop)
+		}
+		outSchema.HasAdditionalProperties = SchemaHasAdditionalProperties(schema)
+		outSchema.AdditionalPropertiesType = &Schema{
+			GoType: "interface{}",
+		}
+		// TODO: implement later
+		// if schema.AdditionalProperties != nil {
+		// 	additionalSchema, err := GenerateEsSchema(schema.AdditionalProperties, path)
+		// 	if err != nil {
+		// 		return Schema{}, errors.Wrap(err, "error generating type for additional properties")
+		// 	}
+		//
+		// 	outSchema.AdditionalPropertiesType = &additionalSchema
+		// }
+
+		if d := GenEsTemplateFromSchema(outSchema); d != "" {
+			outSchema.EsTemplate = d
+		}
+		return outSchema, nil
+	} else {
+		f := schema.Format
+		e := parseEsType(schema)
+		if e != "" {
+			outSchema.EsTemplate = fmt.Sprintf(`"type": "%s"`, e)
+		}
+		switch t {
+		case "array":
+			// For arrays, we'll get the type of the Items and throw a
+			// [] in front of it.
+			arrayType, err := GenerateEsSchema(schema.Items, path)
+			if err != nil {
+				return Schema{}, errors.Wrap(err, "error generating type for array")
+			}
+			// in case item is array object. type will be nested and format will like
+			// "type": "nested", "properties": {"xxx": {"type": "text"}}
+			if arrayType.EsTemplateDecl() != "" {
+				outSchema.EsTemplate = fmt.Sprintf(`"type": "nested",%s`, arrayType.EsTemplateDecl())
+			}
+			outSchema.Properties = arrayType.Properties
+		case "integer":
+			// We default to int if format doesn't ask for something else.
+			if f != "int64" && f != "int32" && f != "" {
+				return Schema{}, fmt.Errorf("invalid integer format: %s", f)
+			}
+		case "number":
+			// We default to float for "number"
+			if f != "double" && f != "float" && f != "" {
+				return Schema{}, fmt.Errorf("invalid number format: %s", f)
+			}
+		case "boolean":
+			if f != "" {
+				return Schema{}, fmt.Errorf("invalid format (%s) for boolean", f)
+			}
+		case "string":
+			// Do nothing
 		default:
 			return Schema{}, fmt.Errorf("unhandled Schema type: %s", t)
 		}
@@ -358,6 +511,50 @@ func GenStructFromSchema(schema Schema) string {
 	return strings.Join(objectParts, "\n")
 }
 
+// GenEsTemplateFromProperties do create properties data for es index template from OpenAPI definition properties
+func GenEsTemplateFromProperties(props []Property) []string {
+	var fields []string
+	for _, p := range props {
+		// in case estemplate is not null.
+		// that mean data will be allof or array or $ref
+		// with array data, format will like: {"fieldName": {"type": "nested", "properties": {"xxx": {"type": "text"}}}
+		// with allof, $ref data, format will like: {"fieldName": {"properties": {"xxx": {"type": "text"}}}
+		if p.Schema.EsTemplate != "" {
+			field := fmt.Sprintf(`"%s": {`, p.JsonFieldName)
+			field += p.Schema.EsTemplate
+			field += `}`
+			fields = append(fields, field)
+		} else {
+			// in case normal object.
+			// append all properties into es index template
+			if p.EsTag == "" {
+				continue
+			}
+			field := fmt.Sprintf(`"%s":`, p.JsonFieldName)
+			esTag := p.EsTag
+			field += fmt.Sprintf(`{"type": "%s"}`, esTag)
+			fields = append(fields, field)
+		}
+	}
+	return fields
+}
+
+// GenEsTemplateFromSchema do generate template index from schema
+// format will like `"properties": { "field1": { "type": "text" }, "field2": { "type": "text" } }`
+func GenEsTemplateFromSchema(schema Schema) string {
+	// Start out with "properties": {
+	objectParts := []string{`"properties": {`}
+	// Append all the field definitions into template format
+	fields := GenEsTemplateFromProperties(schema.Properties)
+	if strings.Join(fields, "") == "" {
+		return ""
+	}
+	// TODO: handle for additional properties fields
+	objectParts = append(objectParts, strings.Join(fields, ",\n"))
+	objectParts = append(objectParts, "}")
+	return strings.Join(objectParts, "\n")
+}
+
 // Merge all the fields in the schemas supplied into one giant schema.
 func MergeSchemas(allOf []*openapi3.SchemaRef, path []string) (Schema, error) {
 	var outSchema Schema
@@ -408,6 +605,10 @@ func MergeSchemas(allOf []*openapi3.SchemaRef, path []string) (Schema, error) {
 	if err != nil {
 		return Schema{}, errors.Wrap(err, "unable to generate aggregate type for AllOf")
 	}
+	outSchema.EsTemplate, err = GenEsTemplateFromAllOf(allOf, path)
+	if err != nil {
+		return Schema{}, errors.Wrap(err, "unable to generate aggregate indices for AllOf")
+	}
 	return outSchema, nil
 }
 
@@ -447,6 +648,62 @@ func GenStructFromAllOf(allOf []*openapi3.SchemaRef, path []string) (string, err
 		}
 	}
 	objectParts = append(objectParts, "}")
+	return strings.Join(objectParts, "\n"), nil
+}
+
+// GenEsTemplateFromAllOf do create es template to for `allOf` field
+func GenEsTemplateFromAllOf(allOf []*openapi3.SchemaRef, path []string) (string, error) {
+	// Start out with "properties": {
+	objectParts := []string{`"properties": {`}
+	var props []string
+	for _, schemaOrRef := range allOf {
+		// Inline all the fields from the schema into the output struct,
+		// just like in the simple case of generating an object.
+		esSchema, err := GenerateEsSchema(schemaOrRef, path)
+		if err != nil {
+			return "", err
+		}
+		fields := GenEsTemplateFromProperties(esSchema.Properties)
+		props = append(props, strings.Join(fields, ",\n"))
+	}
+	if strings.Join(props, "") == "" {
+		return "", nil
+	}
+	objectParts = append(objectParts, strings.Join(props, ",\n"))
+	objectParts = append(objectParts, "}")
+
+	return strings.Join(objectParts, "\n"), nil
+}
+
+// GenEsTemplateFromReference do create es template from $ref field
+// format will like `"properties": { "field1": { "type": "text" }, "field2": { "type": "text" } }`
+func GenEsTemplateFromReference(reference *openapi3.SchemaRef, path []string) (string, error) {
+	// fmt.Println(path, reference.Ref)
+	s, err := isDeepMapObject(reference)
+	if err != nil {
+		return "", err
+	}
+	if s != "" {
+		return s, nil
+	}
+	// Start out with "properties": {
+	objectParts := []string{`"properties": {`}
+	var props []string
+	reference.Ref = ""
+	// Inline all the fields from the schema into the output struct,
+	// just like in the simple case of generating an object.
+	esSchema, err := GenerateEsSchema(reference, path)
+	if err != nil {
+		return "", err
+	}
+	fields := GenEsTemplateFromProperties(esSchema.Properties)
+	props = append(props, strings.Join(fields, ",\n"))
+	if strings.Join(props, "") == "" {
+		return "", nil
+	}
+	objectParts = append(objectParts, strings.Join(props, ",\n"))
+	objectParts = append(objectParts, "}")
+
 	return strings.Join(objectParts, "\n"), nil
 }
 
@@ -563,4 +820,82 @@ func parseValidateRule(schema *openapi3.Schema, required bool) map[string]string
 		}
 	}
 	return v
+}
+
+func parseEsType(schema *openapi3.Schema) string {
+	v := ""
+	if len(schema.Extensions) > 0 {
+		for key, ext := range schema.Extensions {
+			if key == "x-es-tag" {
+				var s string
+				var e []string
+				err := json.Unmarshal(ext.(json.RawMessage), &s)
+				if err != nil {
+					if err := json.Unmarshal(ext.(json.RawMessage), &e); err != nil {
+						panic(err)
+					}
+				} else {
+					e = append(e, s)
+				}
+				v = strings.Join(e[:], ",")
+			}
+		}
+	}
+	return v
+}
+
+func isDeepMapObject(reference *openapi3.SchemaRef) (string, error) {
+	fields := []string{}
+	isCall := false
+	isInfinityObject(reference, &fields, &isCall)
+	if isCall {
+		field := fmt.Sprintf(`"type": "%s"`, "nested")
+		return field, nil
+	}
+	return "", nil
+}
+
+func isInfinityObject(ref *openapi3.SchemaRef, refs *[]string, isRecall *bool) {
+	schema := ref.Value
+	if ref.Ref != "" {
+		*refs = append(*refs, ref.Ref)
+	}
+	dup := isDuplicate(*refs)
+	*isRecall = dup
+	if isRecall != nil && *isRecall {
+		return
+	}
+
+	switch schema.Type {
+	case "", "object":
+		if len(schema.Properties) == 0 {
+			return
+		}
+		// We've got an object with some properties.
+		for _, pName := range SortedSchemaKeys(schema.Properties) {
+			p := schema.Properties[pName]
+			isInfinityObject(p, refs, isRecall)
+		}
+		if schema.AdditionalProperties != nil {
+			isInfinityObject(schema.AdditionalProperties, refs, isRecall)
+		}
+	case "array":
+		isInfinityObject(schema.Items, refs, isRecall)
+	}
+	return
+}
+
+func isDuplicate(refs []string) bool {
+	// Use map to record duplicates as we find them.
+	keys := map[string]struct{}{}
+
+	for _, entry := range refs {
+		_, ok := keys[entry]
+		if !ok {
+			keys[entry] = struct{}{}
+		} else {
+			return true
+		}
+	}
+	return false
 }

@@ -1,0 +1,5 @@
+{
+{{ $types := .Types }}
+{{range $index, $element := $types}}
+{{- if $index}},{{end}}"{{.TypeName}}": {{.Schema.EsTemplateDecl}}{{end}}
+}
