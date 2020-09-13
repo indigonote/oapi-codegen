@@ -607,7 +607,7 @@ func GenerateEsTemplate(t *template.Template, types []TypeDefinition) (string, e
 	}
 	for _, v := range context.Types {
 		if v.Schema.EsTemplateDecl() != "" {
-			v.Schema.EsTemplate = fmt.Sprintf(`{ "mapping": {%s}}`, v.Schema.EsTemplate)
+			v.Schema.EsTemplate = fmt.Sprintf(`{ "mappings": {%s}}`, v.Schema.EsTemplate)
 			newContext.Types = append(newContext.Types, v)
 		}
 	}

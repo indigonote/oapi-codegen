@@ -1,6 +1,6 @@
 {
     "FhirCodeSystem": {
-        "mapping": {
+        "mappings": {
             "properties": {
                 "concept": {
                     "type": "nested"
@@ -24,7 +24,7 @@
         }
     },
     "FhirEncounter": {
-        "mapping": {
+        "mappings": {
             "properties": {
                 "class": {
                     "properties": {
@@ -142,7 +142,7 @@
         }
     },
     "FhirPatient": {
-        "mapping": {
+        "mappings": {
             "properties": {
                 "active": {
                     "type": "boolean"
