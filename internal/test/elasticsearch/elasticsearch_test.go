@@ -90,7 +90,7 @@ func TestElasticSearch(t *testing.T) {
 
 var expect = `{
     "FhirCodeSystem": {
-        "mapping": {
+        "mappings": {
             "properties": {
                 "concept": {
                     "properties": {

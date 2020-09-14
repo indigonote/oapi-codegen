@@ -325,7 +325,8 @@ func GenerateEsSchema(sref *openapi3.SchemaRef, path []string) (Schema, error) {
 	// so that in a RESTful paradigm, the Create operation can return
 	// (object, id), so that other operations can refer to (id)
 	if schema.AllOf != nil {
-		mergedSchema, err := MergeSchemas(schema.AllOf, path)
+		tag := parseEsType(schema)
+		mergedSchema, err := MergeSchemasForEs(schema.AllOf, path, tag)
 		if err != nil {
 			return Schema{}, errors.Wrap(err, "error merging schemas")
 		}
@@ -605,10 +606,6 @@ func MergeSchemas(allOf []*openapi3.SchemaRef, path []string) (Schema, error) {
 	if err != nil {
 		return Schema{}, errors.Wrap(err, "unable to generate aggregate type for AllOf")
 	}
-	outSchema.EsTemplate, err = GenEsTemplateFromAllOf(allOf, path)
-	if err != nil {
-		return Schema{}, errors.Wrap(err, "unable to generate aggregate indices for AllOf")
-	}
 	return outSchema, nil
 }
 
@@ -651,10 +648,25 @@ func GenStructFromAllOf(allOf []*openapi3.SchemaRef, path []string) (string, err
 	return strings.Join(objectParts, "\n"), nil
 }
 
+// MergeSchemasForEs do merge all the fields in the schemas supplied into one giant schema.
+func MergeSchemasForEs(allOf []*openapi3.SchemaRef, path []string, tag string) (Schema, error) {
+	var outSchema Schema
+	// Now, we generate the struct which merges together all the fields.
+	var err error
+	outSchema.EsTemplate, err = GenEsTemplateFromAllOf(allOf, path, tag)
+	if err != nil {
+		return Schema{}, errors.Wrap(err, "unable to generate aggregate indices for AllOf")
+	}
+	return outSchema, nil
+
+}
+
 // GenEsTemplateFromAllOf do create es template to for `allOf` field
-func GenEsTemplateFromAllOf(allOf []*openapi3.SchemaRef, path []string) (string, error) {
+func GenEsTemplateFromAllOf(allOf []*openapi3.SchemaRef, path []string, tag string) (string, error) {
 	// Start out with "properties": {
-	objectParts := []string{`"properties": {`}
+	if tag != "" {
+		return fmt.Sprintf(`"type": "%s"`, "nested"), nil
+	}
 	var props []string
 	for _, schemaOrRef := range allOf {
 		// Inline all the fields from the schema into the output struct,
@@ -663,16 +675,13 @@ func GenEsTemplateFromAllOf(allOf []*openapi3.SchemaRef, path []string) (string,
 		if err != nil {
 			return "", err
 		}
-		fields := GenEsTemplateFromProperties(esSchema.Properties)
-		props = append(props, strings.Join(fields, ",\n"))
+		props = append(props, esSchema.EsTemplateDecl())
 	}
 	if strings.Join(props, "") == "" {
 		return "", nil
 	}
-	objectParts = append(objectParts, strings.Join(props, ",\n"))
-	objectParts = append(objectParts, "}")
 
-	return strings.Join(objectParts, "\n"), nil
+	return strings.Join(props, "\n"), nil
 }
 
 // GenEsTemplateFromReference do create es template from $ref field
@@ -686,25 +695,16 @@ func GenEsTemplateFromReference(reference *openapi3.SchemaRef, path []string) (s
 	if s != "" {
 		return s, nil
 	}
-	// Start out with "properties": {
-	objectParts := []string{`"properties": {`}
-	var props []string
-	reference.Ref = ""
+	newRef := *reference
+	newRef.Ref = ""
 	// Inline all the fields from the schema into the output struct,
 	// just like in the simple case of generating an object.
-	esSchema, err := GenerateEsSchema(reference, path)
+	esSchema, err := GenerateEsSchema(&newRef, path)
 	if err != nil {
 		return "", err
 	}
-	fields := GenEsTemplateFromProperties(esSchema.Properties)
-	props = append(props, strings.Join(fields, ",\n"))
-	if strings.Join(props, "") == "" {
-		return "", nil
-	}
-	objectParts = append(objectParts, strings.Join(props, ",\n"))
-	objectParts = append(objectParts, "}")
 
-	return strings.Join(objectParts, "\n"), nil
+	return esSchema.EsTemplateDecl(), nil
 }
 
 // This constructs a Go type for a parameter, looking at either the schema or
