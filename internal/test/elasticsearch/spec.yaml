@@ -333,6 +333,7 @@ components:
             - fhirInstant
           x-es-tag:
             - text
+            - fielddata
         extension:
           type: array
           items:

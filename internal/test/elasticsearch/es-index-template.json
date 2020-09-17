@@ -100,6 +100,7 @@
                             "type": "nested"
                         },
                         "lastUpdated": {
+                            "fielddata": "true",
                             "type": "text"
                         },
                         "versionId": {
@@ -336,6 +337,7 @@
                             "type": "nested"
                         },
                         "lastUpdated": {
+                            "fielddata": "true",
                             "type": "text"
                         },
                         "versionId": {
