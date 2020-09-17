@@ -675,7 +675,8 @@ func GenEsTemplateFromAllOf(allOf []*openapi3.SchemaRef, path []string, tag stri
 		if err != nil {
 			return "", err
 		}
-		props = append(props, esSchema.EsTemplateDecl())
+		template := fmt.Sprintf(`"type": "nested",%s`, esSchema.EsTemplateDecl())
+		props = append(props, template)
 	}
 	if strings.Join(props, "") == "" {
 		return "", nil
@@ -703,8 +704,9 @@ func GenEsTemplateFromReference(reference *openapi3.SchemaRef, path []string) (s
 	if err != nil {
 		return "", err
 	}
+	template := fmt.Sprintf(`"type": "nested",%s`, esSchema.EsTemplateDecl())
 
-	return esSchema.EsTemplateDecl(), nil
+	return template, nil
 }
 
 // This constructs a Go type for a parameter, looking at either the schema or

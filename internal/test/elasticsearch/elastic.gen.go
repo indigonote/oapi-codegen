@@ -60,7 +60,7 @@ type CreateConsulter struct {
 
 // FhirAddress defines model for fhir-address.
 type FhirAddress struct {
-	Country    *string `json:"country" validate:"omitempty,fhirString,max=1048576"`
+	Country    *string `json:"country" validate:"omitempty,max=1048576,fhirString"`
 	PostalCode *string `json:"postalCode" validate:"omitempty,max=1048576,fhirString"`
 	Text       *string `json:"text" validate:"omitempty,max=1048576,fhirString"`
 }
@@ -125,7 +125,7 @@ type FhirConcept struct {
 // FhirContactPoint defines model for fhir-contact-point.
 type FhirContactPoint struct {
 	System *string `json:"system" validate:"omitempty,oneof=phone email "`
-	Value  *string `json:"value" validate:"omitempty,max=1048576,fhirString"`
+	Value  *string `json:"value" validate:"omitempty,fhirString,max=1048576"`
 }
 
 // FhirEncounter defines model for fhir-encounter.
@@ -175,7 +175,7 @@ type FhirHumanName struct {
 type FhirIdentifier struct {
 	System *string `json:"system" validate:"omitempty,fhirUri"`
 	Use    *string `json:"use" validate:"omitempty,oneof=usual official "`
-	Value  *string `json:"value" validate:"omitempty,fhirString,max=1048576"`
+	Value  *string `json:"value" validate:"omitempty,max=1048576,fhirString"`
 }
 
 // FhirMeta defines model for fhir-meta.
