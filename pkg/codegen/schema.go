@@ -397,7 +397,16 @@ func GenerateEsSchema(sref *openapi3.SchemaRef, path []string) (Schema, error) {
 		f := schema.Format
 		e := parseEsType(schema)
 		if e != "" {
-			outSchema.EsTemplate = fmt.Sprintf(`"type": "%s"`, e)
+			parts := strings.Split(e, ",")
+			templates := []string{}
+			for _, v := range parts {
+				if v == "fielddata" {
+					templates = append(templates, `"fielddata": "true"`)
+				} else {
+					templates = append(templates, fmt.Sprintf(`"type": "%s"`, v))
+				}
+			}
+			outSchema.EsTemplate = strings.Join(templates, ",")
 		}
 		switch t {
 		case "array":
@@ -652,11 +661,14 @@ func GenStructFromAllOf(allOf []*openapi3.SchemaRef, path []string) (string, err
 func MergeSchemasForEs(allOf []*openapi3.SchemaRef, path []string, tag string) (Schema, error) {
 	var outSchema Schema
 	// Now, we generate the struct which merges together all the fields.
-	var err error
-	outSchema.EsTemplate, err = GenEsTemplateFromAllOf(allOf, path, tag)
+	template, err := GenEsTemplateFromAllOf(allOf, path, tag)
 	if err != nil {
 		return Schema{}, errors.Wrap(err, "unable to generate aggregate indices for AllOf")
 	}
+	if template != "" {
+		template = fmt.Sprintf(`"type": "nested",%s`, template)
+	}
+	outSchema.EsTemplate = template
 	return outSchema, nil
 
 }
@@ -703,8 +715,11 @@ func GenEsTemplateFromReference(reference *openapi3.SchemaRef, path []string) (s
 	if err != nil {
 		return "", err
 	}
-
-	return esSchema.EsTemplateDecl(), nil
+	template := ""
+	if esSchema.EsTemplateDecl() != "" {
+		template = fmt.Sprintf(`"type": "nested",%s`, esSchema.EsTemplateDecl())
+	}
+	return template, nil
 }
 
 // This constructs a Go type for a parameter, looking at either the schema or

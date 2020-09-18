@@ -428,6 +428,9 @@ func GenerateEsTemplateForSchemas(t *template.Template, schemas map[string]*open
 
 func isExistEsTag(sref *openapi3.SchemaRef) bool {
 	schema := sref.Value
+	if sref.Ref != "" {
+		return false
+	}
 	tags := getXTags(schema)
 	for _, v := range tags {
 		if v == "elastic" {

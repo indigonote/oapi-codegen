@@ -34,7 +34,8 @@
                         "system": {
                             "type": "text"
                         }
-                    }
+                    },
+                    "type": "nested"
                 },
                 "id": {
                     "type": "keyword"
@@ -72,7 +73,8 @@
                                         "url": {
                                             "type": "text"
                                         }
-                                    }
+                                    },
+                                    "type": "nested"
                                 },
                                 "valueCode": {
                                     "type": "text"
@@ -88,7 +90,8 @@
                                         "type": {
                                             "type": "text"
                                         }
-                                    }
+                                    },
+                                    "type": "nested"
                                 },
                                 "valueString": {
                                     "type": "text"
@@ -97,12 +100,14 @@
                             "type": "nested"
                         },
                         "lastUpdated": {
+                            "fielddata": "true",
                             "type": "text"
                         },
                         "versionId": {
                             "type": "text"
                         }
-                    }
+                    },
+                    "type": "nested"
                 },
                 "participant": {
                     "properties": {
@@ -114,7 +119,8 @@
                                 "type": {
                                     "type": "text"
                                 }
-                            }
+                            },
+                            "type": "nested"
                         },
                         "type": {
                             "properties": {
@@ -195,7 +201,8 @@
                                 "url": {
                                     "type": "text"
                                 }
-                            }
+                            },
+                            "type": "nested"
                         },
                         "valueCode": {
                             "type": "text"
@@ -211,7 +218,8 @@
                                 "type": {
                                     "type": "text"
                                 }
-                            }
+                            },
+                            "type": "nested"
                         },
                         "valueString": {
                             "type": "text"
@@ -260,7 +268,8 @@
                                 "type": {
                                     "type": "text"
                                 }
-                            }
+                            },
+                            "type": "nested"
                         },
                         "type": {
                             "type": "text"
@@ -301,7 +310,8 @@
                                         "url": {
                                             "type": "text"
                                         }
-                                    }
+                                    },
+                                    "type": "nested"
                                 },
                                 "valueCode": {
                                     "type": "text"
@@ -317,7 +327,8 @@
                                         "type": {
                                             "type": "text"
                                         }
-                                    }
+                                    },
+                                    "type": "nested"
                                 },
                                 "valueString": {
                                     "type": "text"
@@ -326,12 +337,14 @@
                             "type": "nested"
                         },
                         "lastUpdated": {
+                            "fielddata": "true",
                             "type": "text"
                         },
                         "versionId": {
                             "type": "text"
                         }
-                    }
+                    },
+                    "type": "nested"
                 },
                 "name": {
                     "properties": {
@@ -366,7 +379,8 @@
                                         "url": {
                                             "type": "text"
                                         }
-                                    }
+                                    },
+                                    "type": "nested"
                                 },
                                 "valueCode": {
                                     "type": "text"
@@ -382,7 +396,8 @@
                                         "type": {
                                             "type": "text"
                                         }
-                                    }
+                                    },
+                                    "type": "nested"
                                 },
                                 "valueString": {
                                     "type": "text"
