@@ -402,6 +402,8 @@ func GenerateEsSchema(sref *openapi3.SchemaRef, path []string) (Schema, error) {
 			for _, v := range parts {
 				if v == "fielddata" {
 					templates = append(templates, `"fielddata": "true"`)
+				} else if v == "text" {
+					templates = append(templates, fmt.Sprintf(`"type": "%s","fields": {"keyword": {"type": "keyword", "ignore_above" : 256}}`, v))
 				} else {
 					templates = append(templates, fmt.Sprintf(`"type": "%s"`, v))
 				}
