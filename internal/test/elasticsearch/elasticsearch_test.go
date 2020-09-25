@@ -95,9 +95,21 @@ var expect = `{
                 "concept": {
                     "properties": {
                         "code": {
+                            "fields": {
+                                "keyword": {
+                                    "ignore_above": 256,
+                                    "type": "keyword"
+                                }
+                            },
                             "type": "text"
                         },
                         "display": {
+                            "fields": {
+                                "keyword": {
+                                    "ignore_above": 256,
+                                    "type": "keyword"
+                                }
+                            },
                             "type": "text"
                         }
                     },
@@ -107,6 +119,12 @@ var expect = `{
                     "type": "keyword"
                 },
                 "status": {
+                    "fields": {
+                        "keyword": {
+                            "ignore_above": 256,
+                            "type": "keyword"
+                        }
+                    },
                     "type": "text"
                 }
             }

@@ -60,9 +60,9 @@ type CreateConsulter struct {
 
 // FhirAddress defines model for fhir-address.
 type FhirAddress struct {
-	Country    *string `json:"country" validate:"omitempty,max=1048576,fhirString"`
+	Country    *string `json:"country" validate:"omitempty,fhirString,max=1048576"`
 	PostalCode *string `json:"postalCode" validate:"omitempty,max=1048576,fhirString"`
-	Text       *string `json:"text" validate:"omitempty,fhirString,max=1048576"`
+	Text       *string `json:"text" validate:"omitempty,max=1048576,fhirString"`
 }
 
 // FhirAttachment defines model for fhir-attachment.
@@ -101,7 +101,7 @@ type FhirCodeSystem struct {
 	Id      *string        `json:"id,omitempty" validate:"omitempty,fhirID"`
 	Name    *string        `json:"name,omitempty" validate:"omitempty,max=1048576,fhirString"`
 	Status  string         `json:"status" validate:"oneof=active "`
-	Title   *string        `json:"title,omitempty" validate:"omitempty,max=1048576,fhirString"`
+	Title   *string        `json:"title,omitempty" validate:"omitempty,fhirString,max=1048576"`
 }
 
 // FhirCodeableConcept defines model for fhir-codeable-concept.
