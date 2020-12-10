@@ -179,26 +179,6 @@
                                     "type": "text"
                                 },
                                 "valueReference": {
-                                    "properties": {
-                                        "reference": {
-                                            "fields": {
-                                                "keyword": {
-                                                    "ignore_above": 256,
-                                                    "type": "keyword"
-                                                }
-                                            },
-                                            "type": "text"
-                                        },
-                                        "type": {
-                                            "fields": {
-                                                "keyword": {
-                                                    "ignore_above": 256,
-                                                    "type": "keyword"
-                                                }
-                                            },
-                                            "type": "text"
-                                        }
-                                    },
                                     "type": "nested"
                                 },
                                 "valueString": {
@@ -223,6 +203,52 @@
                             },
                             "type": "text"
                         },
+                        "security": {
+                            "properties": {
+                                "code": {
+                                    "fields": {
+                                        "keyword": {
+                                            "ignore_above": 256,
+                                            "type": "keyword"
+                                        }
+                                    },
+                                    "type": "text"
+                                },
+                                "system": {
+                                    "fields": {
+                                        "keyword": {
+                                            "ignore_above": 256,
+                                            "type": "keyword"
+                                        }
+                                    },
+                                    "type": "text"
+                                }
+                            },
+                            "type": "nested"
+                        },
+                        "tag": {
+                            "properties": {
+                                "code": {
+                                    "fields": {
+                                        "keyword": {
+                                            "ignore_above": 256,
+                                            "type": "keyword"
+                                        }
+                                    },
+                                    "type": "text"
+                                },
+                                "system": {
+                                    "fields": {
+                                        "keyword": {
+                                            "ignore_above": 256,
+                                            "type": "keyword"
+                                        }
+                                    },
+                                    "type": "text"
+                                }
+                            },
+                            "type": "nested"
+                        },
                         "versionId": {
                             "fields": {
                                 "keyword": {
@@ -239,6 +265,121 @@
                     "properties": {
                         "individual": {
                             "properties": {
+                                "extension": {
+                                    "properties": {
+                                        "url": {
+                                            "fields": {
+                                                "keyword": {
+                                                    "ignore_above": 256,
+                                                    "type": "keyword"
+                                                }
+                                            },
+                                            "type": "text"
+                                        },
+                                        "valueAttachment": {
+                                            "properties": {
+                                                "contentType": {
+                                                    "fields": {
+                                                        "keyword": {
+                                                            "ignore_above": 256,
+                                                            "type": "keyword"
+                                                        }
+                                                    },
+                                                    "type": "text"
+                                                },
+                                                "creation": {
+                                                    "type": "date"
+                                                },
+                                                "data": {
+                                                    "fields": {
+                                                        "keyword": {
+                                                            "ignore_above": 256,
+                                                            "type": "keyword"
+                                                        }
+                                                    },
+                                                    "type": "text"
+                                                },
+                                                "hash": {
+                                                    "fields": {
+                                                        "keyword": {
+                                                            "ignore_above": 256,
+                                                            "type": "keyword"
+                                                        }
+                                                    },
+                                                    "type": "text"
+                                                },
+                                                "language": {
+                                                    "fields": {
+                                                        "keyword": {
+                                                            "ignore_above": 256,
+                                                            "type": "keyword"
+                                                        }
+                                                    },
+                                                    "type": "text"
+                                                },
+                                                "size": {
+                                                    "fields": {
+                                                        "keyword": {
+                                                            "ignore_above": 256,
+                                                            "type": "keyword"
+                                                        }
+                                                    },
+                                                    "type": "text"
+                                                },
+                                                "title": {
+                                                    "fields": {
+                                                        "keyword": {
+                                                            "ignore_above": 256,
+                                                            "type": "keyword"
+                                                        }
+                                                    },
+                                                    "type": "text"
+                                                },
+                                                "url": {
+                                                    "fields": {
+                                                        "keyword": {
+                                                            "ignore_above": 256,
+                                                            "type": "keyword"
+                                                        }
+                                                    },
+                                                    "type": "text"
+                                                }
+                                            },
+                                            "type": "nested"
+                                        },
+                                        "valueCode": {
+                                            "fields": {
+                                                "keyword": {
+                                                    "ignore_above": 256,
+                                                    "type": "keyword"
+                                                }
+                                            },
+                                            "type": "text"
+                                        },
+                                        "valueInstant": {
+                                            "fields": {
+                                                "keyword": {
+                                                    "ignore_above": 256,
+                                                    "type": "keyword"
+                                                }
+                                            },
+                                            "type": "text"
+                                        },
+                                        "valueReference": {
+                                            "type": "nested"
+                                        },
+                                        "valueString": {
+                                            "fields": {
+                                                "keyword": {
+                                                    "ignore_above": 256,
+                                                    "type": "keyword"
+                                                }
+                                            },
+                                            "type": "text"
+                                        }
+                                    },
+                                    "type": "nested"
+                                },
                                 "reference": {
                                     "fields": {
                                         "keyword": {
@@ -445,26 +586,6 @@
                             "type": "text"
                         },
                         "valueReference": {
-                            "properties": {
-                                "reference": {
-                                    "fields": {
-                                        "keyword": {
-                                            "ignore_above": 256,
-                                            "type": "keyword"
-                                        }
-                                    },
-                                    "type": "text"
-                                },
-                                "type": {
-                                    "fields": {
-                                        "keyword": {
-                                            "ignore_above": 256,
-                                            "type": "keyword"
-                                        }
-                                    },
-                                    "type": "text"
-                                }
-                            },
                             "type": "nested"
                         },
                         "valueString": {
@@ -484,6 +605,121 @@
                 },
                 "generalPractitioner": {
                     "properties": {
+                        "extension": {
+                            "properties": {
+                                "url": {
+                                    "fields": {
+                                        "keyword": {
+                                            "ignore_above": 256,
+                                            "type": "keyword"
+                                        }
+                                    },
+                                    "type": "text"
+                                },
+                                "valueAttachment": {
+                                    "properties": {
+                                        "contentType": {
+                                            "fields": {
+                                                "keyword": {
+                                                    "ignore_above": 256,
+                                                    "type": "keyword"
+                                                }
+                                            },
+                                            "type": "text"
+                                        },
+                                        "creation": {
+                                            "type": "date"
+                                        },
+                                        "data": {
+                                            "fields": {
+                                                "keyword": {
+                                                    "ignore_above": 256,
+                                                    "type": "keyword"
+                                                }
+                                            },
+                                            "type": "text"
+                                        },
+                                        "hash": {
+                                            "fields": {
+                                                "keyword": {
+                                                    "ignore_above": 256,
+                                                    "type": "keyword"
+                                                }
+                                            },
+                                            "type": "text"
+                                        },
+                                        "language": {
+                                            "fields": {
+                                                "keyword": {
+                                                    "ignore_above": 256,
+                                                    "type": "keyword"
+                                                }
+                                            },
+                                            "type": "text"
+                                        },
+                                        "size": {
+                                            "fields": {
+                                                "keyword": {
+                                                    "ignore_above": 256,
+                                                    "type": "keyword"
+                                                }
+                                            },
+                                            "type": "text"
+                                        },
+                                        "title": {
+                                            "fields": {
+                                                "keyword": {
+                                                    "ignore_above": 256,
+                                                    "type": "keyword"
+                                                }
+                                            },
+                                            "type": "text"
+                                        },
+                                        "url": {
+                                            "fields": {
+                                                "keyword": {
+                                                    "ignore_above": 256,
+                                                    "type": "keyword"
+                                                }
+                                            },
+                                            "type": "text"
+                                        }
+                                    },
+                                    "type": "nested"
+                                },
+                                "valueCode": {
+                                    "fields": {
+                                        "keyword": {
+                                            "ignore_above": 256,
+                                            "type": "keyword"
+                                        }
+                                    },
+                                    "type": "text"
+                                },
+                                "valueInstant": {
+                                    "fields": {
+                                        "keyword": {
+                                            "ignore_above": 256,
+                                            "type": "keyword"
+                                        }
+                                    },
+                                    "type": "text"
+                                },
+                                "valueReference": {
+                                    "type": "nested"
+                                },
+                                "valueString": {
+                                    "fields": {
+                                        "keyword": {
+                                            "ignore_above": 256,
+                                            "type": "keyword"
+                                        }
+                                    },
+                                    "type": "text"
+                                }
+                            },
+                            "type": "nested"
+                        },
                         "reference": {
                             "fields": {
                                 "keyword": {
@@ -544,6 +780,121 @@
                     "properties": {
                         "other": {
                             "properties": {
+                                "extension": {
+                                    "properties": {
+                                        "url": {
+                                            "fields": {
+                                                "keyword": {
+                                                    "ignore_above": 256,
+                                                    "type": "keyword"
+                                                }
+                                            },
+                                            "type": "text"
+                                        },
+                                        "valueAttachment": {
+                                            "properties": {
+                                                "contentType": {
+                                                    "fields": {
+                                                        "keyword": {
+                                                            "ignore_above": 256,
+                                                            "type": "keyword"
+                                                        }
+                                                    },
+                                                    "type": "text"
+                                                },
+                                                "creation": {
+                                                    "type": "date"
+                                                },
+                                                "data": {
+                                                    "fields": {
+                                                        "keyword": {
+                                                            "ignore_above": 256,
+                                                            "type": "keyword"
+                                                        }
+                                                    },
+                                                    "type": "text"
+                                                },
+                                                "hash": {
+                                                    "fields": {
+                                                        "keyword": {
+                                                            "ignore_above": 256,
+                                                            "type": "keyword"
+                                                        }
+                                                    },
+                                                    "type": "text"
+                                                },
+                                                "language": {
+                                                    "fields": {
+                                                        "keyword": {
+                                                            "ignore_above": 256,
+                                                            "type": "keyword"
+                                                        }
+                                                    },
+                                                    "type": "text"
+                                                },
+                                                "size": {
+                                                    "fields": {
+                                                        "keyword": {
+                                                            "ignore_above": 256,
+                                                            "type": "keyword"
+                                                        }
+                                                    },
+                                                    "type": "text"
+                                                },
+                                                "title": {
+                                                    "fields": {
+                                                        "keyword": {
+                                                            "ignore_above": 256,
+                                                            "type": "keyword"
+                                                        }
+                                                    },
+                                                    "type": "text"
+                                                },
+                                                "url": {
+                                                    "fields": {
+                                                        "keyword": {
+                                                            "ignore_above": 256,
+                                                            "type": "keyword"
+                                                        }
+                                                    },
+                                                    "type": "text"
+                                                }
+                                            },
+                                            "type": "nested"
+                                        },
+                                        "valueCode": {
+                                            "fields": {
+                                                "keyword": {
+                                                    "ignore_above": 256,
+                                                    "type": "keyword"
+                                                }
+                                            },
+                                            "type": "text"
+                                        },
+                                        "valueInstant": {
+                                            "fields": {
+                                                "keyword": {
+                                                    "ignore_above": 256,
+                                                    "type": "keyword"
+                                                }
+                                            },
+                                            "type": "text"
+                                        },
+                                        "valueReference": {
+                                            "type": "nested"
+                                        },
+                                        "valueString": {
+                                            "fields": {
+                                                "keyword": {
+                                                    "ignore_above": 256,
+                                                    "type": "keyword"
+                                                }
+                                            },
+                                            "type": "text"
+                                        }
+                                    },
+                                    "type": "nested"
+                                },
                                 "reference": {
                                     "fields": {
                                         "keyword": {
@@ -680,26 +1031,6 @@
                                     "type": "text"
                                 },
                                 "valueReference": {
-                                    "properties": {
-                                        "reference": {
-                                            "fields": {
-                                                "keyword": {
-                                                    "ignore_above": 256,
-                                                    "type": "keyword"
-                                                }
-                                            },
-                                            "type": "text"
-                                        },
-                                        "type": {
-                                            "fields": {
-                                                "keyword": {
-                                                    "ignore_above": 256,
-                                                    "type": "keyword"
-                                                }
-                                            },
-                                            "type": "text"
-                                        }
-                                    },
                                     "type": "nested"
                                 },
                                 "valueString": {
@@ -723,6 +1054,52 @@
                                 }
                             },
                             "type": "text"
+                        },
+                        "security": {
+                            "properties": {
+                                "code": {
+                                    "fields": {
+                                        "keyword": {
+                                            "ignore_above": 256,
+                                            "type": "keyword"
+                                        }
+                                    },
+                                    "type": "text"
+                                },
+                                "system": {
+                                    "fields": {
+                                        "keyword": {
+                                            "ignore_above": 256,
+                                            "type": "keyword"
+                                        }
+                                    },
+                                    "type": "text"
+                                }
+                            },
+                            "type": "nested"
+                        },
+                        "tag": {
+                            "properties": {
+                                "code": {
+                                    "fields": {
+                                        "keyword": {
+                                            "ignore_above": 256,
+                                            "type": "keyword"
+                                        }
+                                    },
+                                    "type": "text"
+                                },
+                                "system": {
+                                    "fields": {
+                                        "keyword": {
+                                            "ignore_above": 256,
+                                            "type": "keyword"
+                                        }
+                                    },
+                                    "type": "text"
+                                }
+                            },
+                            "type": "nested"
                         },
                         "versionId": {
                             "fields": {
@@ -839,26 +1216,6 @@
                                     "type": "text"
                                 },
                                 "valueReference": {
-                                    "properties": {
-                                        "reference": {
-                                            "fields": {
-                                                "keyword": {
-                                                    "ignore_above": 256,
-                                                    "type": "keyword"
-                                                }
-                                            },
-                                            "type": "text"
-                                        },
-                                        "type": {
-                                            "fields": {
-                                                "keyword": {
-                                                    "ignore_above": 256,
-                                                    "type": "keyword"
-                                                }
-                                            },
-                                            "type": "text"
-                                        }
-                                    },
                                     "type": "nested"
                                 },
                                 "valueString": {

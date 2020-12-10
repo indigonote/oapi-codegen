@@ -263,6 +263,8 @@ components:
           nullable: true
           x-go-custom-tag:
             - fhirValueX
+          x-es-tag:
+            - nested
         valueInstant:
           type: string
           nullable: true
@@ -344,6 +346,14 @@ components:
             - fhirID
           x-es-tag:
             - text
+        tag:
+          type: array
+          items:
+            $ref: '#/components/schemas/fhir-coding'
+        security:
+          type: array
+          items:
+            $ref: '#/components/schemas/fhir-coding'
     fhir-codeable-concept:
       title: fhir-codeable-concept
       type: object
@@ -393,6 +403,10 @@ components:
             - fhirUri
           x-es-tag:
             - text
+        extension:
+          type: array
+          items:
+            $ref: '#/components/schemas/fhir-extension'
       description: FHIR Reference
       nullable: true
     fhir-human-name:

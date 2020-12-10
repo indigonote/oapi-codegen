@@ -60,7 +60,7 @@ type CreateConsulter struct {
 
 // FhirAddress defines model for fhir-address.
 type FhirAddress struct {
-	Country    *string `json:"country" validate:"omitempty,fhirString,max=1048576"`
+	Country    *string `json:"country" validate:"omitempty,max=1048576,fhirString"`
 	PostalCode *string `json:"postalCode" validate:"omitempty,max=1048576,fhirString"`
 	Text       *string `json:"text" validate:"omitempty,max=1048576,fhirString"`
 }
@@ -101,7 +101,7 @@ type FhirCodeSystem struct {
 	Id      *string        `json:"id,omitempty" validate:"omitempty,fhirID"`
 	Name    *string        `json:"name,omitempty" validate:"omitempty,max=1048576,fhirString"`
 	Status  string         `json:"status" validate:"oneof=active "`
-	Title   *string        `json:"title,omitempty" validate:"omitempty,fhirString,max=1048576"`
+	Title   *string        `json:"title,omitempty" validate:"omitempty,max=1048576,fhirString"`
 }
 
 // FhirCodeableConcept defines model for fhir-codeable-concept.
@@ -161,7 +161,7 @@ type FhirExtension struct {
 		// Embedded struct due to allOf(#/components/schemas/fhir-reference)
 		FhirReference
 	} `json:"valueReference" validate:"omitempty,fhirValueX"`
-	ValueString *string `json:"valueString" validate:"omitempty,max=1048576,fhirString,fhirValueX"`
+	ValueString *string `json:"valueString" validate:"omitempty,fhirString,fhirValueX,max=1048576"`
 }
 
 // FhirHumanName defines model for fhir-human-name.
@@ -175,13 +175,15 @@ type FhirHumanName struct {
 type FhirIdentifier struct {
 	System *string `json:"system" validate:"omitempty,fhirUri"`
 	Use    *string `json:"use" validate:"omitempty,oneof=usual official "`
-	Value  *string `json:"value" validate:"omitempty,max=1048576,fhirString"`
+	Value  *string `json:"value" validate:"omitempty,fhirString,max=1048576"`
 }
 
 // FhirMeta defines model for fhir-meta.
 type FhirMeta struct {
 	Extension   *[]FhirExtension `json:"extension,omitempty"`
 	LastUpdated *string          `json:"lastUpdated" validate:"omitempty,fhirInstant"`
+	Security    *[]FhirCoding    `json:"security,omitempty"`
+	Tag         *[]FhirCoding    `json:"tag,omitempty"`
 	VersionId   *string          `json:"versionId,omitempty" validate:"omitempty,fhirID"`
 }
 
@@ -234,8 +236,9 @@ type FhirPatient struct {
 
 // FhirReference defines model for fhir-reference.
 type FhirReference struct {
-	Reference *string `json:"reference" validate:"omitempty,max=1048576,fhirString"`
-	Type      *string `json:"type" validate:"omitempty,fhirUri"`
+	Extension *[]FhirExtension `json:"extension,omitempty"`
+	Reference *string          `json:"reference" validate:"omitempty,fhirString,max=1048576"`
+	Type      *string          `json:"type" validate:"omitempty,fhirUri"`
 }
 
 // PostConsultersJSONBody defines parameters for PostConsulters.
@@ -540,43 +543,44 @@ func RegisterHandlers(router EchoRouter, si ServerInterface) {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
+	"VqHry/X/AwAA///f7tCcrCsAAA==",
 }
 
 // GetSwagger returns the Swagger specification corresponding to the generated code
