@@ -864,7 +864,7 @@ func parseEsType(schema *openapi3.Schema) string {
 func isDeepMapObject(reference *openapi3.SchemaRef) (string, error) {
 	fields := []string{}
 	isCall := false
-	isInfinityObject(reference, &fields, &isCall)
+	isInfinityObject("", reference, &fields, &isCall)
 	if isCall {
 		field := fmt.Sprintf(`"type": "%s"`, "nested")
 		return field, nil
@@ -872,17 +872,20 @@ func isDeepMapObject(reference *openapi3.SchemaRef) (string, error) {
 	return "", nil
 }
 
-func isInfinityObject(ref *openapi3.SchemaRef, refs *[]string, isRecall *bool) {
+func isInfinityObject(parentTitle string, ref *openapi3.SchemaRef, refs *[]string, isRecall *bool) {
+	parentT := parentTitle
 	schema := ref.Value
-	if ref.Ref != "" {
-		*refs = append(*refs, ref.Ref)
+	if ref.Ref != "" && parentT != "" && strings.Contains(ref.Ref, parentT) {
+		*isRecall = true
 	}
-	dup := isDuplicate(*refs)
-	*isRecall = dup
+
 	if isRecall != nil && *isRecall {
 		return
 	}
-
+	// only run one time at initial
+	if parentT == "" {
+		parentT = schema.Title
+	}
 	switch schema.Type {
 	case "", "object":
 		if len(schema.Properties) == 0 {
@@ -891,13 +894,13 @@ func isInfinityObject(ref *openapi3.SchemaRef, refs *[]string, isRecall *bool) {
 		// We've got an object with some properties.
 		for _, pName := range SortedSchemaKeys(schema.Properties) {
 			p := schema.Properties[pName]
-			isInfinityObject(p, refs, isRecall)
+			isInfinityObject(parentT, p, refs, isRecall)
 		}
 		if schema.AdditionalProperties != nil {
-			isInfinityObject(schema.AdditionalProperties, refs, isRecall)
+			isInfinityObject(parentT, schema.AdditionalProperties, refs, isRecall)
 		}
 	case "array":
-		isInfinityObject(schema.Items, refs, isRecall)
+		isInfinityObject(parentT, schema.Items, refs, isRecall)
 	}
 	return
 }
